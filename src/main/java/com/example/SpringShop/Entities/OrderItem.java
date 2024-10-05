@@ -1,4 +1,4 @@
-package com.example.java78.entities;
+package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 

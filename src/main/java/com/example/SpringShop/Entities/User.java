@@ -1,4 +1,4 @@
-package com.example.java78.entities;
+package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 
@@ -20,4 +20,24 @@ public class User {
 
     @Column(name = "role", nullable = false, length = 10)
     private String role;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getRole() {
+        return role;
+    }
 }

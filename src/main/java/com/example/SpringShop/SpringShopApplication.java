@@ -1,13 +1,13 @@
-package com.example.java78;
+package com.example.SpringShop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Java78Application {
+public class SpringShopApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Java78Application.class, args);
+        SpringApplication.run(SpringShopApplication.class, args);
     }
 
 }
