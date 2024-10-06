@@ -12,11 +12,16 @@ public class ProductDetailsDto {
     private int status; //new, used
     private String location;
     private long creatorId;
+    private String creatorName;
+    private String creatorEmail;
+    private String creatorPhone;
+    private String creatorLocation;
+
 
     public ProductDetailsDto() {
     }
 
-    public ProductDetailsDto(long id, String title, String description, double price, String category, List<String> images, int status, String location, long creatorId) {
+    public ProductDetailsDto(long id, String title, String description, double price, String category, List<String> images, int status, String location, long creatorId, String creatorName, String creatorEmail, String creatorPhone, String creatorLocation) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -26,6 +31,10 @@ public class ProductDetailsDto {
         this.status = status;
         this.location = location;
         this.creatorId = creatorId;
+        this.creatorName = creatorName;
+        this.creatorEmail = creatorEmail;
+        this.creatorPhone = creatorPhone;
+        this.creatorLocation = creatorLocation;
     }
 
     public long getId() {
@@ -98,5 +107,37 @@ public class ProductDetailsDto {
 
     public void setCreatorId(long creatorId) {
         this.creatorId = creatorId;
+    }
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
+
+    public String getCreatorEmail() {
+        return creatorEmail;
+    }
+
+    public void setCreatorEmail(String creatorEmail) {
+        this.creatorEmail = creatorEmail;
+    }
+
+    public String getCreatorPhone() {
+        return creatorPhone;
+    }
+
+    public void setCreatorPhone(String creatorPhone) {
+        this.creatorPhone = creatorPhone;
+    }
+
+    public String getCreatorLocation() {
+        return creatorLocation;
+    }
+
+    public void setCreatorLocation(String creatorLocation) {
+        this.creatorLocation = creatorLocation;
     }
 }
