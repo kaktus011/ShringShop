@@ -18,8 +18,11 @@ public class Product {
     @Column(name = "description", nullable = false)
     private String description;
 
+    @Column(name = "location", nullable = false)
+    private String location;
+
     @Column(name = "status", nullable = false)
-    private String status; //new, old, used with no remarks
+    private String status;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
@@ -28,10 +31,10 @@ public class Product {
     private double price;
 
     @Column(name = "views")
-    private int view;//kolko puti produkta e vidqn
+    private int view;
 
     @Column(name = "is_active")
-    private boolean isActive;//dali obqvata za produkt e aktivna ili ne
+    private boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
