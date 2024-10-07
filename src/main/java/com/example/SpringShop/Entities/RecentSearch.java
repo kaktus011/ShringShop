@@ -9,8 +9,8 @@ public class RecentSearch {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "search_term", nullable = false)
-    private String searchTerm;
+    @Column(name = "search_name", nullable = false)
+    private String searchName;
     @Column(name = "search_date", nullable = false)
     private LocalDateTime searchDate;
     @ManyToOne
