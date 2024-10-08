@@ -46,4 +46,52 @@ public class Product {
     @ManyToOne
     @JoinColumn(name ="category_id", nullable = false)
     private Category category;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getImage() {
+        return imageUrl;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public List<Customer> getCustomersWhoFavourited() {
+        return customersWhoFavourited;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
 }
