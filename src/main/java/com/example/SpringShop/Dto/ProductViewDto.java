@@ -60,4 +60,9 @@ public class ProductViewDto {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public String getLocation() {return location;}
+
+    public void setLocation(String location) {this.location = location;}
+
 }

@@ -137,4 +137,12 @@ public class CustomerService {
         userRepository.save(user);
         return customerRepository.findByUser(user);
     }
+    public Long getCustomerId(String username){
+        User user = userRepository.findByUsername(username);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+        Customer customer = customerRepository.findByUser(user);
+        return customer.getId();
+    }
 }
