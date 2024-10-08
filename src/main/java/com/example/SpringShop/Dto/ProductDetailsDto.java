@@ -12,6 +12,7 @@ public class ProductDetailsDto {
     private long creatorId;
     private String creatorName;
     private String creatorPhone;
+    private String creatorEmail;
 
 
     public ProductDetailsDto() {
@@ -72,16 +73,6 @@ public class ProductDetailsDto {
         this.category = category;
     }
 
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-
     public String getStatus() {
         return status;
     }
@@ -124,4 +115,8 @@ public class ProductDetailsDto {
     public void setCreatorPhone(String creatorPhone) {
         this.creatorPhone = creatorPhone;
     }
+
+    public String getCreatorEmail() {return creatorEmail;}
+
+    public void setCreatorEmail(String creatorEmail) {this.creatorEmail = creatorEmail;}
 }

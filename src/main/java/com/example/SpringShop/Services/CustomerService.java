@@ -168,5 +168,14 @@ public class CustomerService {
     public List<String> getTop10MostSearched() {
         return customerRepository.findTop10MostSearched();
     }
+
+    public Long getCustomerId(String username){
+        User user = userRepository.findByUsername(username);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+        Customer customer = customerRepository.findByUser(user);
+        return customer.getId();
+    }
 }
 
