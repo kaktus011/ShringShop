@@ -8,9 +8,6 @@ public class HomepageViewDto {
     private List<String> lastSearched;
     private List<String> popularSearches;
 
-    public HomepageViewDto() {
-    }
-
     public HomepageViewDto(List<String> categories, List<ProductViewDto> products, List<String> lastSearched, List<String> popularSearches) {
         this.categories = categories;
         this.products = products;

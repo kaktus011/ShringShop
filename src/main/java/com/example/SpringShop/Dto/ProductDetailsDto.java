@@ -1,7 +1,5 @@
 package com.example.SpringShop.Dto;
 
-import java.util.List;
-
 public class ProductDetailsDto {
     private long id;
     private String title;
@@ -13,24 +11,24 @@ public class ProductDetailsDto {
     private String location;
     private long creatorId;
     private String creatorName;
-    private String creatorEmail;
     private String creatorPhone;
 
 
     public ProductDetailsDto() {
     }
 
-    public ProductDetailsDto(long id, String title, String description, double price, String category, String status, String location, long creatorId, String creatorName, String creatorEmail, String creatorPhone) {
+
+    public ProductDetailsDto(long id, String title, String description, double price, String category, String image, String status, String location, long creatorId, String creatorName, String creatorPhone) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.price = price;
         this.category = category;
+        this.image = image;
         this.status = status;
         this.location = location;
         this.creatorId = creatorId;
         this.creatorName = creatorName;
-        this.creatorEmail = creatorEmail;
         this.creatorPhone = creatorPhone;
     }
 
@@ -74,6 +72,16 @@ public class ProductDetailsDto {
         this.category = category;
     }
 
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+
     public String getStatus() {
         return status;
     }
@@ -107,14 +115,6 @@ public class ProductDetailsDto {
 
     public void setCreatorName(String creatorName) {
         this.creatorName = creatorName;
-    }
-
-    public String getCreatorEmail() {
-        return creatorEmail;
-    }
-
-    public void setCreatorEmail(String creatorEmail) {
-        this.creatorEmail = creatorEmail;
     }
 
     public String getCreatorPhone() {
