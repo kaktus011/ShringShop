@@ -12,36 +12,33 @@ public class ProductCreateDto {
     @NotBlank(message = "Description is required.")
 
     private String description;
-    @NotBlank(message = "Price is required.")
+
     private double price;
 
     @NotBlank(message = "Category is required.")
     private String category;
 
     @NotBlank(message = "Status is required.")
-    private int status; //new, used
+    private String status;
 
     @NotBlank(message = "Location is required.")
     private String location;
 
-    @NotBlank(message = "Imgages are required.")
-    private List<String> images;
+    @NotBlank(message = "Images are required.")
+    private String image;
 
-    private String mobileNumber;
-
-    private String email;
-    private long creatorId;
 
     public ProductCreateDto() {
     }
 
-    public ProductCreateDto(String title, String description, double price, String category, int status, String location) {
+    public ProductCreateDto(String title, String description, double price, String category, String status, String location, String image) {
         this.title = title;
         this.description = description;
         this.price = price;
         this.category = category;
         this.status = status;
         this.location = location;
+        this.image = image;
     }
 
     public String getTitle() {
@@ -76,11 +73,11 @@ public class ProductCreateDto {
         this.category = category;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -92,19 +89,13 @@ public class ProductCreateDto {
         this.location = location;
     }
 
-    public List<String> getImages() {
-        return images;
+    public String getImage() {
+        return image;
     }
 
-    public void setImages(List<String> images) {
-        this.images = images;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public long getCreatorId() {
-        return creatorId;
-    }
 
-    public void setCreatorId(long creatorId) {
-        this.creatorId = creatorId;
-    }
 }

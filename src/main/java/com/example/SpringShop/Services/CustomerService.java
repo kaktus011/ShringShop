@@ -142,11 +142,14 @@ public class CustomerService {
         return customerRepository.findByUser(user);
     }
 
+
     public Customer getCustomerByUsername(String username){
+
         User user = userRepository.findByUsername(username);
         if (user == null){
             throw new RuntimeException("User not found");
         }
+
         return customerRepository.findByUser(user);
     }
 
@@ -166,3 +169,4 @@ public class CustomerService {
         return customerRepository.findTop10MostSearched();
     }
 }
+

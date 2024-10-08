@@ -21,19 +21,21 @@ public class RecentSearch {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() {return id;}
 
-    public String getSearchName() {
-        return searchName;
-    }
+    public void setId(Long id) {this.id = id;}
 
-    public LocalDateTime getSearchDate() {
-        return searchDate;
-    }
+    public String getSearchName() {return searchName;}
 
-    public Customer getCustomer() {
-        return customer;
-    }
+    public void setSearchName(String searchName) {this.searchName = searchName;}
+
+    public LocalDateTime getSearchDate() {return searchDate;}
+
+    public void setSearchDate(LocalDateTime searchDate) {this.searchDate = searchDate;}
+
+    public Customer getCustomer() {return customer;}
+
+    public void setCustomer(Customer customer) {this.customer = customer;}
+
 }
+

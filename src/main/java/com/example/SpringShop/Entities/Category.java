@@ -18,27 +18,18 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() {return id;}
 
-    public String getName() {
-        return name;
-    }
+    public void setId(Long id) {this.id = id;}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() {return name;}
 
-    public List<Product> getProducts() {
-        return products;
-    }
+    public void setName(String name) {this.name = name;}
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
+    public List<Product> getProducts() {return products;}
+
+    public void setProducts(List<Product> products) {this.products = products;}
+
+  
 }

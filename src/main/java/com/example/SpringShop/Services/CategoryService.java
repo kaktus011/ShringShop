@@ -1,5 +1,9 @@
 package com.example.SpringShop.Services;
 
+
+import org.springframework.stereotype.Service;
+
+
 import com.example.SpringShop.Entities.Category;
 import com.example.SpringShop.Repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,4 +39,5 @@ public class CategoryService {
 
         return categoryName;
     }
+
 }

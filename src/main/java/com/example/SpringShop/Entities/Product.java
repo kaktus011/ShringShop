@@ -2,6 +2,7 @@ package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -36,6 +37,9 @@ public class Product {
     @Column(name = "is_active")
     private boolean isActive;
 
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
+
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
@@ -47,51 +51,58 @@ public class Product {
     @JoinColumn(name ="category_id", nullable = false)
     private Category category;
 
-    public Long getId() {
-        return id;
-    }
 
-    public String getTitle() {
-        return title;
-    }
+    public Long getId() {return id;}
 
-    public String getDescription() {
-        return description;
-    }
+    public void setId(Long id) {this.id = id;}
 
-    public String getLocation() {
-        return location;
-    }
+    public String getTitle() {return title;}
 
-    public String getStatus() {
-        return status;
-    }
+    public void setTitle(String title) {this.title = title;}
 
-    public String getImage() {
-        return imageUrl;
-    }
+    public String getDescription() {return description;}
 
-    public double getPrice() {
-        return price;
-    }
+    public void setDescription(String description) {this.description = description;}
 
-    public int getView() {
-        return view;
-    }
+    public String getLocation() {return location;}
 
-    public boolean isActive() {
-        return isActive;
-    }
+    public void setLocation(String location) {this.location = location;}
 
-    public Customer getCustomer() {
-        return customer;
-    }
+    public String getStatus() {return status;}
 
-    public List<Customer> getCustomersWhoFavourited() {
-        return customersWhoFavourited;
-    }
+    public void setStatus(String status) {this.status = status;}
 
-    public Category getCategory() {
-        return category;
-    }
+    public String getImageUrl() {return imageUrl;}
+
+    public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
+
+    public double getPrice() {return price;}
+
+    public void setPrice(double price) {this.price = price;}
+
+    public int getView() {return view;}
+
+    public void setView(int view) {this.view = view;}
+
+    public boolean isActive() {return isActive;}
+
+    public void setActive(boolean active) {isActive = active;}
+
+    public Customer getCustomer() {return customer;}
+
+    public void setCustomer(Customer customer) {this.customer = customer;}
+
+    public List<Customer> getCustomersWhoFavourited() {return customersWhoFavourited;}
+
+    public void setCustomersWhoFavourited(List<Customer> customersWhoFavourited) {this.customersWhoFavourited = customersWhoFavourited;}
+
+    public Category getCategory() {return category;}
+
+    public void setCategory(Category category) {this.category = category;}
+
+    public LocalDateTime getCreationDate() {return creationDate;}
+
+    public void setCreationDate(LocalDateTime creationDate) {this.creationDate = creationDate;}
 }
+
+
