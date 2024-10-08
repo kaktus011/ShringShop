@@ -1,15 +1,35 @@
 package com.example.SpringShop.Dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 
 public class ProductCreateDto {
+
+    @NotBlank(message = "Title is required.")
     private String title;
+
+    @NotBlank(message = "Description is required.")
+
     private String description;
+    @NotBlank(message = "Price is required.")
     private double price;
+
+    @NotBlank(message = "Category is required.")
     private String category;
+
+    @NotBlank(message = "Status is required.")
     private int status; //new, used
+
+    @NotBlank(message = "Location is required.")
     private String location;
+
+    @NotBlank(message = "Imgages are required.")
     private List<String> images;
+
+    private String mobileNumber;
+
+    private String email;
     private long creatorId;
 
     public ProductCreateDto() {
