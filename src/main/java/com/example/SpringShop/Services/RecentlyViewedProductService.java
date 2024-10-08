@@ -17,7 +17,7 @@ public class RecentlyViewedProductService {
         this.recentlyViewedProductRepository = recentlyViewedProductRepository;
     }
 
-    public List<RecentlyViewedProduct> getLast10ViewedProducts(long customerId) {
+    public List<RecentlyViewedProduct> getLast10ViewedProducts(Long customerId) {
         return recentlyViewedProductRepository.findTop10ByCustomerIdOrderByViewedAtDesc(customerId);
     }
 }

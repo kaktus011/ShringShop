@@ -2,6 +2,7 @@ package com.example.SpringShop.Services;
 
 import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Entities.Customer;
+import com.example.SpringShop.Entities.Product;
 import com.example.SpringShop.Entities.RecentSearch;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Repositories.CustomerRepository;
@@ -27,6 +28,7 @@ public class CustomerService {
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final ProductService productService;
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository,
@@ -34,13 +36,15 @@ public class CustomerService {
                            PasswordEncoder passwordEncoder,
                            JWTUtil jwtUtil,
                            AuthenticationManager authenticationManager,
-                           UserDetailsService userDetailsService) {
+                           UserDetailsService userDetailsService,
+                           ProductService productService) {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.productService = productService;
     }
 
     public Customer register(RegisterDto registerDto){
@@ -59,6 +63,7 @@ public class CustomerService {
 
         return customerRepository.save(customer);
     }
+
     public String login(LoginDto loginDto){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
@@ -70,6 +75,7 @@ public class CustomerService {
             throw new RuntimeException("Invalid username or password");
         }
     }
+
     public Customer changeUsername(ChangeUsernameDto changeUsernameDto, String currentUsername){
         User user = userRepository.findByUsername(currentUsername);
 
@@ -89,6 +95,7 @@ public class CustomerService {
         userRepository.save(user);
         return customerRepository.findByUser(user);
     }
+
     public Customer changePassword(ChangePasswordDto changePasswordDto, String currentPassword){
         User user = userRepository.findByUsername(currentPassword);
 
@@ -102,19 +109,7 @@ public class CustomerService {
         userRepository.save(user);
         return customerRepository.findByUser(user);
     }
-    public CustomerDetailsDto getCustomerDetails(String currentName){
-        User user = userRepository.findByUsername(currentName);
-        if (user == null){
-            throw new RuntimeException("User not found");
-        }
-        CustomerDetailsDto customerDetailsDto = new CustomerDetailsDto();
-        customerDetailsDto.setUsername(user.getUsername());
-        customerDetailsDto.setEmail(user.getEmail());
-        Customer customer = customerRepository.findByUser(user);
-        customerDetailsDto.setName(customer.getName());
-        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
-        return customerDetailsDto;
-    }
+
     public Customer changeMobileNumber(ChangeMobileNumberDto changeMobileNumberDto, String currentMobileNumber){
         User user = userRepository.findByUsername(currentMobileNumber);
         if (user == null){
@@ -142,6 +137,18 @@ public class CustomerService {
         return customerRepository.findByUser(user);
     }
 
+    public void makeProductFavourite(Customer customer, Long productId) {
+        Product product = productService.findProductById(productId);
+        customer.getFavouriteProducts().add(product);
+        customerRepository.save(customer);
+    }
+
+    public void deleteFavouriteProduct(Customer customer, Long productId) {
+        Product product = productService.findProductById(productId);
+        customer.getFavouriteProducts().remove(product);
+        customerRepository.save(customer);
+    }
+
     public Customer getCustomerByUsername(String username){
         User user = userRepository.findByUsername(username);
         if (user == null){
@@ -164,5 +171,19 @@ public class CustomerService {
 
     public List<String> getTop10MostSearched() {
         return customerRepository.findTop10MostSearched();
+    }
+
+    public CustomerDetailsDto getCustomerDetails(String currentName){
+        User user = userRepository.findByUsername(currentName);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+        CustomerDetailsDto customerDetailsDto = new CustomerDetailsDto();
+        customerDetailsDto.setUsername(user.getUsername());
+        customerDetailsDto.setEmail(user.getEmail());
+        Customer customer = customerRepository.findByUser(user);
+        customerDetailsDto.setName(customer.getName());
+        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
+        return customerDetailsDto;
     }
 }
