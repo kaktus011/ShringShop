@@ -2,6 +2,7 @@ package com.example.SpringShop.Services;
 
 import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Entities.Customer;
+import com.example.SpringShop.Entities.RecentSearch;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Repositories.CustomerRepository;
 import com.example.SpringShop.Repositories.UserRepository;
@@ -14,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -136,5 +140,29 @@ public class CustomerService {
         user.setEmail(changeEmailDto.getNewEmail());
         userRepository.save(user);
         return customerRepository.findByUser(user);
+    }
+
+    public Customer getCustomerByUsername(String username){
+        User user = userRepository.findByUsername(username);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+        return customerRepository.findByUser(user);
+    }
+
+    public List<String> getRecentSearches(String username){
+        User user = userRepository.findByUsername(username);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+
+        Customer customer = customerRepository.findByUser(user);
+        return customer.getRecentSearches().stream()
+                .map(RecentSearch::getSearchName)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getTop10MostSearched() {
+        return customerRepository.findTop10MostSearched();
     }
 }
