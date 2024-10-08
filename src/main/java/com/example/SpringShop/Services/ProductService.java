@@ -4,18 +4,15 @@ import com.example.SpringShop.Dto.ProductCreateDto;
 import com.example.SpringShop.Dto.ProductDetailsDto;
 import com.example.SpringShop.Dto.ProductViewDto;
 import com.example.SpringShop.Entities.*;
+import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +26,7 @@ public class ProductService {
     private final UserRepository userRepository;
     private final RecentSearchRepository recentSearchRepository;
 
+    @Autowired
     public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
@@ -128,7 +126,7 @@ public class ProductService {
 
 
         List<ProductViewDto> productViewDtos = filteredProducts.stream()
-                .map(this::convertToViewDto)
+                .map(ProductMapper::toProductViewDto)
                 .collect(Collectors.toList());
 
         User user = userRepository.findByUsername(username);
@@ -148,15 +146,8 @@ public class ProductService {
         return productPage;
     }
 
-
-    private ProductViewDto convertToViewDto(Product product) {
-        ProductViewDto dto = new ProductViewDto();
-        dto.setId(product.getId());
-        dto.setTitle(product.getTitle());
-        dto.setPrice(product.getPrice());
-        dto.setLocation(product.getLocation());
-        dto.setImage(product.getImageUrl());
-        dto.setCreatedAt(product.getCreationDate());
-        return dto;
+    public Product findProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 }

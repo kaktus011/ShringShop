@@ -2,8 +2,6 @@ package com.example.SpringShop.Dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
-
 public class ProductCreateDto {
 
     @NotBlank(message = "Title is required.")
