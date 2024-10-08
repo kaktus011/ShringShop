@@ -12,9 +12,12 @@ public class ProductDetailsDto {
     private long creatorId;
     private String creatorName;
     private String creatorPhone;
+    private String creatorEmail;
+
 
     public ProductDetailsDto() {
     }
+
 
     public ProductDetailsDto(long id, String title, String description, double price, String category, String image, String status, String location, long creatorId, String creatorName, String creatorPhone) {
         this.id = id;
@@ -70,14 +73,6 @@ public class ProductDetailsDto {
         this.category = category;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -93,6 +88,9 @@ public class ProductDetailsDto {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    public String getImage() {return image;}
+    public void setImage(String image) {this.image = image;}
 
     public long getCreatorId() {
         return creatorId;
@@ -117,4 +115,8 @@ public class ProductDetailsDto {
     public void setCreatorPhone(String creatorPhone) {
         this.creatorPhone = creatorPhone;
     }
+
+    public String getCreatorEmail() {return creatorEmail;}
+
+    public void setCreatorEmail(String creatorEmail) {this.creatorEmail = creatorEmail;}
 }

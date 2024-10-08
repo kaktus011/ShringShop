@@ -1,12 +1,16 @@
 package com.example.SpringShop.Dto;
 
+import java.time.LocalDateTime;
+
 public class ProductViewDto {
     private long id;
     private String title;
     private double price;
     private String location;
     private String image;
+    private LocalDateTime createdAt;
 
+    public ProductViewDto() {}
     public ProductViewDto(long id, String title, double price, String image, String location) {
         this.id = id;
         this.title = title;
@@ -47,11 +51,10 @@ public class ProductViewDto {
         this.image = image;
     }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getLocation() {return location;}
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public void setLocation(String location) {this.location = location;}
+
+    public LocalDateTime getCreatedAt() {return createdAt;}
+    public void setCreatedAt(LocalDateTime createdAt) {this.createdAt = createdAt;}
 }

@@ -63,7 +63,6 @@ public class CustomerService {
 
         return customerRepository.save(customer);
     }
-
     public String login(LoginDto loginDto){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
@@ -75,7 +74,6 @@ public class CustomerService {
             throw new RuntimeException("Invalid username or password");
         }
     }
-
     public Customer changeUsername(ChangeUsernameDto changeUsernameDto, String currentUsername){
         User user = userRepository.findByUsername(currentUsername);
 
@@ -95,7 +93,6 @@ public class CustomerService {
         userRepository.save(user);
         return customerRepository.findByUser(user);
     }
-
     public Customer changePassword(ChangePasswordDto changePasswordDto, String currentPassword){
         User user = userRepository.findByUsername(currentPassword);
 
@@ -109,7 +106,19 @@ public class CustomerService {
         userRepository.save(user);
         return customerRepository.findByUser(user);
     }
-
+    public CustomerDetailsDto getCustomerDetails(String currentName){
+        User user = userRepository.findByUsername(currentName);
+        if (user == null){
+            throw new RuntimeException("User not found");
+        }
+        CustomerDetailsDto customerDetailsDto = new CustomerDetailsDto();
+        customerDetailsDto.setUsername(user.getUsername());
+        customerDetailsDto.setEmail(user.getEmail());
+        Customer customer = customerRepository.findByUser(user);
+        customerDetailsDto.setName(customer.getName());
+        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
+        return customerDetailsDto;
+    }
     public Customer changeMobileNumber(ChangeMobileNumberDto changeMobileNumberDto, String currentMobileNumber){
         User user = userRepository.findByUsername(currentMobileNumber);
         if (user == null){
@@ -154,6 +163,7 @@ public class CustomerService {
         if (user == null){
             throw new RuntimeException("User not found");
         }
+
         return customerRepository.findByUser(user);
     }
 
@@ -173,17 +183,13 @@ public class CustomerService {
         return customerRepository.findTop10MostSearched();
     }
 
-    public CustomerDetailsDto getCustomerDetails(String currentName){
-        User user = userRepository.findByUsername(currentName);
+    public Long getCustomerId(String username){
+        User user = userRepository.findByUsername(username);
         if (user == null){
             throw new RuntimeException("User not found");
         }
-        CustomerDetailsDto customerDetailsDto = new CustomerDetailsDto();
-        customerDetailsDto.setUsername(user.getUsername());
-        customerDetailsDto.setEmail(user.getEmail());
         Customer customer = customerRepository.findByUser(user);
-        customerDetailsDto.setName(customer.getName());
-        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
-        return customerDetailsDto;
+        return customer.getId();
     }
 }
+
