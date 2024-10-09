@@ -1,10 +1,8 @@
 package com.example.SpringShop.Services;
 
 import com.example.SpringShop.Dto.*;
-import com.example.SpringShop.Entities.Customer;
-import com.example.SpringShop.Entities.Product;
-import com.example.SpringShop.Entities.RecentSearch;
-import com.example.SpringShop.Entities.User;
+import com.example.SpringShop.Entities.*;
+import com.example.SpringShop.Repositories.CartRepository;
 import com.example.SpringShop.Repositories.CustomerRepository;
 import com.example.SpringShop.Repositories.UserRepository;
 import com.example.SpringShop.Utilities.JWTUtil;
@@ -29,6 +27,7 @@ public class CustomerService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final ProductService productService;
+    private final CartRepository cartRepository;
 
     @Autowired
     public CustomerService(CustomerRepository customerRepository,
@@ -37,7 +36,7 @@ public class CustomerService {
                            JWTUtil jwtUtil,
                            AuthenticationManager authenticationManager,
                            UserDetailsService userDetailsService,
-                           ProductService productService) {
+                           ProductService productService, CartRepository cartRepository) {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -45,6 +44,7 @@ public class CustomerService {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.productService = productService;
+        this.cartRepository = cartRepository;
     }
 
     public Customer register(RegisterDto registerDto){
@@ -60,8 +60,13 @@ public class CustomerService {
         customer.setUser(user);
         customer.setMobileNumber(registerDto.getMobileNumber());
         customer.setName(registerDto.getName());
+        customerRepository.save(customer);
 
-        return customerRepository.save(customer);
+        Cart cart = new Cart();
+        cart.setCustomer(customer);
+        cartRepository.save(cart);
+
+        return customer;
     }
     public String login(LoginDto loginDto){
         try {
