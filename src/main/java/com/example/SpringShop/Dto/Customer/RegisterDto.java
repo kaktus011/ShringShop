@@ -1,28 +1,32 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Customer;
 
 import com.example.SpringShop.Validation.PasswordMatches;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @PasswordMatches
 public class RegisterDto {
-    @NotBlank(message = "Mobile number is required")
+    @NotBlank(message = "Mobile number is required.")
+    @Pattern(regexp = "^\\d{10}$", message = "Old mobile number must be exactly 10 digits.")
     private String mobileNumber;
 
-    @NotBlank(message = "Name is required")
+    @NotBlank(message = "Name is required.")
+    @Size(max = 70, message = "Name must be up to 70 characters.")
     private String name;
 
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Username is required.")
     private String username;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Password is required.")
     private String password;
 
-    @NotBlank(message = "Confirm password is required")
+    @NotBlank(message = "Confirm password is required.")
     private String confirmPassword;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required.")
+    @Email(message = "Email should be valid.")
     private String email;
 
     public String getMobileNumber() {return mobileNumber;}

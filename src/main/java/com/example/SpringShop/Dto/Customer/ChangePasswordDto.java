@@ -1,4 +1,4 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Customer;
 
 import com.example.SpringShop.Validation.NewAndConfirmPasswordMatches;
 import jakarta.validation.constraints.NotBlank;
