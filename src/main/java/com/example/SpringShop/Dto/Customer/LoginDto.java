@@ -1,15 +1,14 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Customer;
 
 import jakarta.validation.constraints.NotBlank;
 
 public class LoginDto {
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Username is required.")
     private String username;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Password is required.")
     private String password;
 
-    // Constructors
     public LoginDto() {}
 
     public LoginDto(String username, String password) {

@@ -1,10 +1,14 @@
 package com.example.SpringShop.Controllers;
 
+import com.example.SpringShop.Dto.ErrorResponseDto;
 import com.example.SpringShop.Dto.ProductViewDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.EntityMappers.ProductMapper;
+import com.example.SpringShop.Exceptions.CustomerNotFoundException;
+import com.example.SpringShop.Exceptions.UserNotFoundException;
 import com.example.SpringShop.Services.CustomerService;
-import com.example.SpringShop.Services.RecentlyViewedProductService;
+import com.example.SpringShop.Services.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,58 +25,80 @@ import java.util.stream.Collectors;
 public class FavouritesController {
 
     private final CustomerService customerService;
-    private final RecentlyViewedProductService recentlyViewedProductService;
+    private final ProductService productService;
 
-    public FavouritesController(CustomerService customerService, RecentlyViewedProductService recentlyViewedProductService) {
+    public FavouritesController(CustomerService customerService, ProductService productService) {
         this.customerService = customerService;
-        this.recentlyViewedProductService = recentlyViewedProductService;
+        this.productService = productService;
     }
 
     @GetMapping("/get-favourite-products")
-    public ResponseEntity<List<ProductViewDto>> getFavouriteProducts() {
+    public ResponseEntity<?> getFavouriteProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Customer customer = customerService.getCustomerByUsername(currentUsername);
-        var favourites = customer.getFavouriteProducts().stream().map(ProductMapper::toProductViewDto).toList();
-
-        return ResponseEntity.ok(favourites);
+        String username = authentication.getName();
+        try {
+            Customer customer = customerService.getCustomerByUsername(username);
+            List<ProductViewDto> favouriteProducts = productService.getFavouriteProducts(customer);
+            return ResponseEntity.ok(favouriteProducts);
+        } catch (CustomerNotFoundException | UserNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieving favorite products.");
+        }
     }
 
     @PostMapping("/favorite-product")
-    public ResponseEntity<String> makeProductFavourite(Long productId) {
+    public ResponseEntity<?> makeProductFavourite(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Customer customer = customerService.getCustomerByUsername(currentUsername);
+        String username = authentication.getName();
 
-        customerService.makeProductFavourite(customer, productId);
-
-        return ResponseEntity.ok("Product added to favourites");
+        try {
+            Customer customer = customerService.getCustomerByUsername(username);
+            productService.makeProductFavourite(customer, productId);
+            return ResponseEntity.ok("Product added to favourites");
+        } catch (CustomerNotFoundException | UserNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while making a product favourite.");
+        }
     }
 
     @PostMapping("/unfavorite-product")
-    public ResponseEntity<String> deleteFavouriteProduct(Long productId) {
+    public ResponseEntity<?> deleteFavouriteProduct(Long productId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Customer customer = customerService.getCustomerByUsername(currentUsername);
+        String username = authentication.getName();
 
-        customerService.deleteFavouriteProduct(customer, productId);
-
-        return ResponseEntity.ok("Product removed from favourites");
+        try {
+            Customer customer = customerService.getCustomerByUsername(username);
+            productService.deleteFavouriteProduct(customer, productId);
+            return ResponseEntity.ok("Product removed from favourites");
+        } catch (CustomerNotFoundException | UserNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting a product from favourites.");
+        }
     }
 
     //TODO: Implement the getFavouriteSearches, makeSearchFavourite, deleteFavouriteSearch endpoints
 
     @GetMapping("/get-recent-products")
-    public ResponseEntity<List<ProductViewDto>> getRecentProducts() {
+    public ResponseEntity<?> getRecentProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        Customer customer = customerService.getCustomerByUsername(currentUsername);
+        String username = authentication.getName();
 
-        var products = recentlyViewedProductService.getLast10ViewedProducts(customer.getId());
-        List<ProductViewDto> recentProductsDtos = products.stream()
-                .map(product -> ProductMapper.toProductViewDto(product.getProduct()))
-                .collect(Collectors.toList());
+        try {
+            Customer customer = customerService.getCustomerByUsername(username);
+            var products = productService.getLast10ViewedProducts(customer.getId());
+            return ResponseEntity.ok(products);
 
-        return ResponseEntity.ok(recentProductsDtos);
+        } catch (CustomerNotFoundException | UserNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieveng last viewed products.");
+        }
     }
 }

@@ -1,9 +1,11 @@
 package com.example.SpringShop.Services;
 
-import com.example.SpringShop.Dto.CartViewDto;
+import com.example.SpringShop.Dto.Cart.CartViewDto;
 import com.example.SpringShop.Dto.ProductInCartDto;
 import com.example.SpringShop.Entities.Cart;
 import com.example.SpringShop.Entities.Product;
+import com.example.SpringShop.Exceptions.CartNotFoundException;
+import com.example.SpringShop.Exceptions.InvalidProductException;
 import com.example.SpringShop.Repositories.CartRepository;
 import com.example.SpringShop.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +19,17 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
+    private final ProductService productService;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductRepository productRepository) {
+    public CartService(CartRepository cartRepository, ProductRepository productRepository, ProductService productService) {
         this.cartRepository = cartRepository;
         this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     public CartViewDto getCartForCustomer(Long customerId){
-        Cart cart = cartRepository.findByCustomer_Id(customerId);
-
-        if(cart == null){
-            throw new RuntimeException("Cart Not Found");
-        }
-
+        Cart cart = getCartByCustomerId(customerId);
         List<ProductInCartDto> products = cart.getProducts().stream()
                 .map(product -> new ProductInCartDto(
                         product.getId(),
@@ -47,35 +46,80 @@ public class CartService {
         return cartViewDto;
     }
 
-    public Cart addProductToCart(Long customerId, Long id){
-        Cart cart = cartRepository.findByCustomer_Id(customerId);
-        if(cart == null){
-            throw new RuntimeException("Cart Not Found");
-        }
-        Product product = productRepository.findById(id).get();
-        cart.getProducts().add(product);
+    public CartViewDto addProductToCart(Long customerId, Long productId){
+        Cart cart = getCartByCustomerId(customerId);
+        Product productToAdd = productService.getProductById(productId);
+        cart.getProducts().add(productToAdd);
         cart.setTotalPrice(cart.getProducts().stream().mapToDouble(Product::getPrice).sum());
-        return cartRepository.save(cart);
+         cartRepository.save(cart);
+
+        List<ProductInCartDto> productsInCart = cart.getProducts().stream()
+                .map(product -> new ProductInCartDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getPrice(),
+                        product.getImageUrl()))
+                .collect(Collectors.toList());
+
+        CartViewDto cartViewDto = new CartViewDto();
+        cartViewDto.setCartId(cart.getId());
+        cartViewDto.setProducts(productsInCart);
+        cartViewDto.setCustomerId(customerId);
+        cartViewDto.setTotalPrice(cart.getTotalPrice());
+        return cartViewDto;
     }
 
-    public Cart deleteProductFromCart(Long customerId, Long id){
-        Cart cart = cartRepository.findByCustomer_Id(customerId);
-        if(cart == null){
-            throw new RuntimeException("Cart Not Found");
-        }
-        Product product = productRepository.findById(id).get();
-        cart.getProducts().remove(product);
+    public CartViewDto deleteProductFromCart(Long customerId, Long productId){
+        Cart cart = getCartByCustomerId(customerId);
+        Product productToDelete = productService.getProductById(productId);
+        cart.getProducts().remove(productToDelete);
         cart.setTotalPrice(cart.getProducts().stream().mapToDouble(Product::getPrice).sum());
-        return cartRepository.save(cart);
+        cartRepository.save(cart);
+
+        List<ProductInCartDto> productsInCart = cart.getProducts().stream()
+                .map(product -> new ProductInCartDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getPrice(),
+                        product.getImageUrl()))
+                .collect(Collectors.toList());
+
+        CartViewDto cartViewDto = new CartViewDto();
+        cartViewDto.setCartId(cart.getId());
+        cartViewDto.setProducts(productsInCart);
+        cartViewDto.setCustomerId(customerId);
+        cartViewDto.setTotalPrice(cart.getTotalPrice());
+        return cartViewDto;
     }
 
-    public Cart clearcart(Long customerId){
-        Cart cart = cartRepository.findByCustomer_Id(customerId);
-        if(cart == null){
-            throw new RuntimeException("Cart Not Found");
-        }
+    public CartViewDto clearcart(Long customerId){
+        Cart cart = getCartByCustomerId(customerId);
         cart.setProducts(null);
         cart.setTotalPrice(null);
-        return cartRepository.save(cart);
+         cartRepository.save(cart);
+        List<ProductInCartDto> productsInCart = cart.getProducts().stream()
+                .map(product -> new ProductInCartDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getPrice(),
+                        product.getImageUrl()))
+                .collect(Collectors.toList());
+
+        CartViewDto cartViewDto = new CartViewDto();
+        cartViewDto.setCartId(cart.getId());
+        cartViewDto.setProducts(productsInCart);
+        cartViewDto.setCustomerId(customerId);
+        cartViewDto.setTotalPrice(cart.getTotalPrice());
+        return cartViewDto;
     }
+
+    public Cart getCartByCustomerId(Long customerId) {
+        Cart cart = cartRepository.findByCustomer_Id(customerId);
+        if (cart == null) {
+            throw new CartNotFoundException();
+        }
+
+        return cart;
+    }
+
 }

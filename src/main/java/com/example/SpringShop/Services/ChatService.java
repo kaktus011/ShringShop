@@ -36,7 +36,7 @@ public class ChatService {
         Customer receiver = customerRepository.findById(receiverId)
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
 
-        Chat chat = chatRepository.findByCustomerOne_IdAndCustomerTwo_Id(senderId, receiverId);
+        Chat chat = chatRepository.findChatBetweenCustomers(senderId, receiverId);
 
         if (chat == null) {
             chat = new Chat();
@@ -63,7 +63,23 @@ public class ChatService {
         return new ChatDto(chat.getId(), messages);
     }
 
-    /*public List<ChatOverviewDto> getAllChats(Long senderId){
-        Chat chat = chatRepository.findBy
-    }*/
+    public List<ChatOverviewDto> getAllChats(Long customerId){
+        List<Chat> chats = chatRepository.findAllChatsForCustomer(customerId);
+
+        return chats.stream().map(chat -> {
+            String otherPersonName;
+            Long otherPersonId;
+            if (chat.getCustomerOne().getId().equals(customerId)) {
+                otherPersonName = chat.getCustomerTwo().getName();
+                otherPersonId = chat.getCustomerTwo().getId();
+            } else {
+                otherPersonName = chat.getCustomerOne().getName();
+                otherPersonId = chat.getCustomerOne().getId();
+            }
+            LocalDateTime lastSentMessage = chat.getMessages().isEmpty() ? null : chat.getMessages().get(chat.getMessages().size() - 1).getDate();
+
+            return new ChatOverviewDto(chat.getId(), otherPersonName, otherPersonId, lastSentMessage);
+        }).collect(Collectors.toList());
+
+    }
 }

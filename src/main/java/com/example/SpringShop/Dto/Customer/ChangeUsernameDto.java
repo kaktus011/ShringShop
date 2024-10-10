@@ -1,12 +1,14 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Customer;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class ChangeUsernameDto {
-    @NotBlank(message = "Old username is required")
+    @NotBlank(message = "Old username is required.")
     private String oldUsername;
 
-    @NotBlank(message = "New username is required")
+    @NotBlank(message = "New username is required.")
+    @Size(max = 30, message = "New username must be up to 30 characters.")
     private String newUsername;
 
     public ChangeUsernameDto() {}

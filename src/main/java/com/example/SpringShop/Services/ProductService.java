@@ -5,6 +5,7 @@ import com.example.SpringShop.Dto.ProductDetailsDto;
 import com.example.SpringShop.Dto.ProductViewDto;
 import com.example.SpringShop.Entities.*;
 import com.example.SpringShop.EntityMappers.ProductMapper;
+import com.example.SpringShop.Exceptions.InvalidProductException;
 import com.example.SpringShop.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,14 +26,16 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RecentSearchRepository recentSearchRepository;
+    private final RecentlyViewedProductRepository recentlyViewedProductRepository;
 
     @Autowired
-    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository) {
+    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository, RecentlyViewedProductRepository recentlyViewedProductRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.recentSearchRepository = recentSearchRepository;
+        this.recentlyViewedProductRepository = recentlyViewedProductRepository;
     }
 
     public Product createProduct(Long customerId, ProductCreateDto productCreateDto){
@@ -146,8 +149,37 @@ public class ProductService {
         return productPage;
     }
 
-    public Product findProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public List<ProductViewDto> getLast10ViewedProducts(Long customerId) {
+        List<RecentlyViewedProduct> products = recentlyViewedProductRepository.findTop10ByCustomerIdOrderByViewedAtDesc(customerId);
+
+        return products.stream()
+                .map(product -> ProductMapper.toProductViewDto(product.getProduct()))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductViewDto> getFavouriteProducts(Customer customer) {
+        return customer.getFavouriteProducts().stream()
+                .map(ProductMapper::toProductViewDto)
+                .collect(Collectors.toList());
+    }
+
+    public void makeProductFavourite(Customer customer, Long productId) {
+        Product product = getProductById(productId);
+        customer.getFavouriteProducts().add(product);
+        customerRepository.save(customer);
+    }
+
+    public void deleteFavouriteProduct(Customer customer, Long productId) {
+        Product product = getProductById(productId);
+        customer.getFavouriteProducts().remove(product);
+        customerRepository.save(customer);
+    }
+
+    public Product getProductById(Long id) {
+        Product product = productRepository.findById(id).get();
+        if (product == null) {
+            throw new InvalidProductException();
+        }
+        return product;
     }
 }
