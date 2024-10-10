@@ -12,6 +12,8 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class JWTUtil {
@@ -22,6 +24,7 @@ public class JWTUtil {
     }
 
     private long expirationTime = 86400000;
+    private final Set<String> tokenBlacklist = ConcurrentHashMap.newKeySet();
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
@@ -57,5 +60,13 @@ public class JWTUtil {
 
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
+    }
+
+    private boolean isTokenBlacklisted(String token) {
+        return tokenBlacklist.contains(token);
+    }
+
+    public void invalidateToken(String token) {
+        tokenBlacklist.add(token);
     }
 }
