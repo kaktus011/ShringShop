@@ -3,6 +3,7 @@ package com.example.SpringShop.Controllers;
 import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.Customer;
+import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Utilities.JWTUtil;
@@ -71,7 +72,8 @@ public class CustomerController {
         String currentUsername = authentication.getName();
         try {
             Customer updatedCustomer = customerService.changeUsername(changeUsernameDto, currentUsername);
-            return ResponseEntity.ok(updatedCustomer);
+            var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
+            return ResponseEntity.ok(updatedCustomerDto);
         } catch (UserNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         } catch (WrongUsernameException | UsernameAlreadyTakenException ex) {
@@ -87,7 +89,8 @@ public class CustomerController {
         String username = authentication.getName();
         try {
             Customer updatedCustomer = customerService.changePassword(changePasswordDto, username);
-            return ResponseEntity.ok(updatedCustomer);
+            var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
+            return ResponseEntity.ok(updatedCustomerDto);
         } catch (InvalidPasswordException | PasswordMismatchException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
@@ -112,7 +115,8 @@ public class CustomerController {
         String username = authentication.getName();
         try {
             Customer updatedCustomer = customerService.changeMobileNumber(changeMobileNumberDto, username);
-            return ResponseEntity.ok(updatedCustomer);
+            var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
+            return ResponseEntity.ok(updatedCustomerDto);
         } catch (InvalidMobileNumberException | NewNumberSameLikeOldNumberException | MobileNumberAlreadyTakenException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {
@@ -126,7 +130,8 @@ public class CustomerController {
         String currentName = authentication.getName();
         try {
             Customer updatedCustomer = customerService.changeEmail(changeEmailDto, currentName);
-            return ResponseEntity.ok(updatedCustomer);
+            var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
+            return ResponseEntity.ok(updatedCustomerDto);
         } catch (InvalidEmailException | NewEmailSameLikeOldEmailException | EmailAlreadyTakenException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {

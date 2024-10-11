@@ -4,6 +4,7 @@ import com.example.SpringShop.Constants.UserRoleConstants;
 import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.*;
+import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.CartRepository;
@@ -132,13 +133,9 @@ public class CustomerService {
 
     public CustomerDetailsDto getCustomerDetails(String username){
         User user = userService.getUserByUsername(username);
-        CustomerDetailsDto customerDetailsDto = new CustomerDetailsDto();
-        customerDetailsDto.setUsername(user.getUsername());
-        customerDetailsDto.setEmail(user.getEmail());
         Customer customer = customerRepository.findByUser(user);
-        customerDetailsDto.setName(customer.getName());
-        customerDetailsDto.setMobileNumber(customer.getMobileNumber());
-        return customerDetailsDto;
+
+        return CustomerMapper.toCustomerDetailsDto(customer);
     }
 
     public Customer changeMobileNumber(ChangeMobileNumberDto changeMobileNumberDto, String username){
