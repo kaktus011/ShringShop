@@ -1,6 +1,6 @@
 package com.example.SpringShop.EntityMappers;
 
-import com.example.SpringShop.Dto.CustomerDetailsDto;
+import com.example.SpringShop.Dto.Customer.CustomerDetailsDto;
 import com.example.SpringShop.Entities.Customer;
 
 public class CustomerMapper {

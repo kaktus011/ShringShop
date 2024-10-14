@@ -1,13 +1,17 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.ProductCreateDto;
-import com.example.SpringShop.Dto.ProductDetailsDto;
+import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Product.ProductCreateDto;
+import com.example.SpringShop.Dto.Product.ProductDetailsDto;
 import com.example.SpringShop.Dto.ProductViewDto;
 import com.example.SpringShop.Entities.Product;
+import com.example.SpringShop.EntityMappers.ProductMapper;
+import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,34 +33,61 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateDto productCreateDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Long customerId = customerService.getCustomerId(username);
 
-        Product product = productService.createProduct(customerId, productCreateDto);
-        return ResponseEntity.ok(product);
+        try{
+            Long customerId = customerService.getCustomerId(username);
+            Product product = productService.createProduct(customerId, productCreateDto);
+            var productDto = ProductMapper.toProductIndexDto(product);
+            return ResponseEntity.ok(productDto);
+        }catch (UserNotFoundException | CustomerNotFoundException | CategoryNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailsDto> productDetails(@PathVariable Long id){
+    public ResponseEntity<?> productDetails(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        ProductDetailsDto productDetailsDto = productService.productDetails(id, username);
-        return ResponseEntity.ok(productDetailsDto);
+
+        try{
+            ProductDetailsDto productDetailsDto = productService.productDetails(id, username);
+            return ResponseEntity.ok(productDetailsDto);
+        }catch (UserNotFoundException | CustomerNotFoundException | InvalidProductException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 
-    @PutMapping("/{id}/deactivate")
+    @PutMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivateProduct(@PathVariable Long id) {
-        productService.deactivateProduct(id);
-        return ResponseEntity.ok("Product marked as inactive successfully.");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        try{
+            productService.deactivateProduct(id, username);
+            return ResponseEntity.ok("Product marked as inactive successfully.");
+        }catch (UserNotFoundException | CustomerNotFoundException | InvalidProductException |
+                ProductWithCustomerNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 
-    @PostMapping("/{id}/update")
+    @PostMapping("/update/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductCreateDto productCreateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Long customerId = customerService.getCustomerId(username);
 
-        Product updatedProduct = productService.updateProduct(id, customerId, productCreateDto);
-        return ResponseEntity.ok(updatedProduct);
+        try{
+            Product updatedProduct = productService.updateProduct(id, username, productCreateDto);
+            var productDto = ProductMapper.toProductIndexDto(updatedProduct);
+            return ResponseEntity.ok(productDto);
+        }catch (UserNotFoundException | CustomerNotFoundException | InvalidProductException |
+                ProductWithCustomerNotFoundException | CategoryNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 
     @GetMapping("/all")

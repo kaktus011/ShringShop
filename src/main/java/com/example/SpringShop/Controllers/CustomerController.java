@@ -1,7 +1,8 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Dto.Customer.*;
+import com.example.SpringShop.Dto.Customer.CustomerDetailsDto;
+import com.example.SpringShop.Dto.ErrorResponseDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
@@ -55,7 +56,7 @@ public class CustomerController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") || authorizationHeader.length() <= 7) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in.");
         }
 
@@ -103,13 +104,13 @@ public class CustomerController {
          try{
              CustomerDetailsDto customerDetailsDto = customerService.getCustomerDetails(currentName);
              return ResponseEntity.ok(customerDetailsDto);
-         }catch (UserNotFoundException ex) {
+         }catch (UserNotFoundException | CustomerNotFoundException ex) {
              ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
          }
     }
 
-    @PutMapping("/change-mobileNumber")
+    @PutMapping("/change-mobile-number")
     public ResponseEntity<?> changeMobileNumber(@Valid @RequestBody ChangeMobileNumberDto changeMobileNumberDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

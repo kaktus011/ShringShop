@@ -13,6 +13,11 @@ public class ChangeMobileNumberDto {
     @Pattern(regexp = "^\\d{10}$", message = "Old mobile number must be exactly 10 digits.")
     private String newMobileNumber;
 
+    public ChangeMobileNumberDto(String oldMobileNumber, String newMobileNumber) {
+        this.oldMobileNumber = oldMobileNumber;
+        this.newMobileNumber = newMobileNumber;
+    }
+
     public String getOldMobileNumber() {return oldMobileNumber;}
     public void setOldMobileNumber(String oldMobileNumber) {this.oldMobileNumber = oldMobileNumber;}
     public String getNewMobileNumber() {return newMobileNumber;}

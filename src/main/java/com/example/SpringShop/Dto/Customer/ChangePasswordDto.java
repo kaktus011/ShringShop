@@ -13,6 +13,11 @@ public class ChangePasswordDto {
     @NotBlank(message = "Confirm password is required.")
     private String confirmPassword;
 
+    public ChangePasswordDto(String oldPassword, String newPassword, String confirmPassword) {
+        this.oldPassword = oldPassword;
+        this.newPassword = newPassword;
+        this.confirmPassword = confirmPassword;
+    }
     public String getOldPassword() {return oldPassword;}
 
     public void setOldPassword(String oldPassword) {this.oldPassword = oldPassword;}

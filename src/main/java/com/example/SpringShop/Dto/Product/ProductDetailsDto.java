@@ -1,14 +1,16 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Product;
 
 public class ProductDetailsDto {
-    private long id;
+    private long productId;
     private String title;
     private String description;
     private double price;
+    private Long categoryId;
     private String category;
     private String image;
-    private String status; //new, used
+    private String status;
     private String location;
+    private int views;
     private long creatorId;
     private String creatorName;
     private String creatorPhone;
@@ -20,7 +22,7 @@ public class ProductDetailsDto {
 
 
     public ProductDetailsDto(long id, String title, String description, double price, String category, String image, String status, String location, long creatorId, String creatorName, String creatorPhone) {
-        this.id = id;
+        this.productId = id;
         this.title = title;
         this.description = description;
         this.price = price;
@@ -33,12 +35,12 @@ public class ProductDetailsDto {
         this.creatorPhone = creatorPhone;
     }
 
-    public long getId() {
-        return id;
+    public long getProductId() {
+        return productId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setProductId(long productId) {
+        this.productId = productId;
     }
 
     public String getTitle() {
@@ -72,6 +74,14 @@ public class ProductDetailsDto {
     public void setCategory(String category) {
         this.category = category;
     }
+
+    public Long getCategoryId() { return categoryId; }
+
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    public int getViews() {return  views;}
+
+    public void setViews(int views) {}
 
     public String getStatus() {
         return status;

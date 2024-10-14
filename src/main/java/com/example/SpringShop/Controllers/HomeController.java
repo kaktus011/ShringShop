@@ -2,9 +2,6 @@ package com.example.SpringShop.Controllers;
 
 import com.example.SpringShop.Dto.ErrorResponseDto;
 import com.example.SpringShop.Dto.Home.HomepageViewDto;
-import com.example.SpringShop.Dto.ProductViewDto;
-import com.example.SpringShop.Entities.Customer;
-import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Exceptions.CustomerNotFoundException;
 import com.example.SpringShop.Exceptions.UserNotFoundException;
 import com.example.SpringShop.Services.CategoryService;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

@@ -1,4 +1,4 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Customer;
 
 public class CustomerDetailsDto {
     private long id;

@@ -5,7 +5,6 @@ import com.example.SpringShop.Dto.ProductInCartDto;
 import com.example.SpringShop.Entities.Cart;
 import com.example.SpringShop.Entities.Product;
 import com.example.SpringShop.Exceptions.CartNotFoundException;
-import com.example.SpringShop.Exceptions.InvalidProductException;
 import com.example.SpringShop.Repositories.CartRepository;
 import com.example.SpringShop.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;

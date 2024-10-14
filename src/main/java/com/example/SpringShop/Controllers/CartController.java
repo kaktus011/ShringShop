@@ -2,7 +2,6 @@ package com.example.SpringShop.Controllers;
 
 import com.example.SpringShop.Dto.Cart.CartViewDto;
 import com.example.SpringShop.Dto.ErrorResponseDto;
-import com.example.SpringShop.Entities.Cart;
 import com.example.SpringShop.Exceptions.CartNotFoundException;
 import com.example.SpringShop.Exceptions.CustomerNotFoundException;
 import com.example.SpringShop.Exceptions.InvalidProductException;

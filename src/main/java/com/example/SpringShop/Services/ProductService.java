@@ -1,13 +1,17 @@
 package com.example.SpringShop.Services;
 
-import com.example.SpringShop.Dto.ProductCreateDto;
-import com.example.SpringShop.Dto.ProductDetailsDto;
+import com.example.SpringShop.Dto.Product.ProductCreateDto;
+import com.example.SpringShop.Dto.Product.ProductDetailsDto;
 import com.example.SpringShop.Dto.ProductViewDto;
 import com.example.SpringShop.Entities.*;
 import com.example.SpringShop.EntityMappers.ProductMapper;
+import com.example.SpringShop.Exceptions.CategoryNotFoundException;
+import com.example.SpringShop.Exceptions.CustomerNotFoundException;
 import com.example.SpringShop.Exceptions.InvalidProductException;
+import com.example.SpringShop.Exceptions.ProductWithCustomerNotFoundException;
 import com.example.SpringShop.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
@@ -27,18 +31,29 @@ public class ProductService {
     private final UserRepository userRepository;
     private final RecentSearchRepository recentSearchRepository;
     private final RecentlyViewedProductRepository recentlyViewedProductRepository;
+    private final CustomerService customerService;
 
     @Autowired
-    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository, RecentlyViewedProductRepository recentlyViewedProductRepository) {
+    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository, RecentlyViewedProductRepository recentlyViewedProductRepository, CustomerService customerService) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.recentSearchRepository = recentSearchRepository;
         this.recentlyViewedProductRepository = recentlyViewedProductRepository;
+        this.customerService = customerService;
     }
 
     public Product createProduct(Long customerId, ProductCreateDto productCreateDto){
+        Category category = categoryRepository.findByName(productCreateDto.getCategory());
+        if(category == null){
+            throw new CategoryNotFoundException(productCreateDto.getCategory());
+        }
+        Customer customer = customerRepository.findById(customerId).get();
+        if(customer == null){
+            throw new CustomerNotFoundException();
+        }
+
         Product product = new Product();
         product.setTitle(productCreateDto.getTitle());
         product.setDescription(productCreateDto.getDescription());
@@ -50,18 +65,27 @@ public class ProductService {
         product.setActive(true);
         product.setCreationDate(LocalDateTime.now());
 
-        Customer customer = customerRepository.findById(customerId).get();
         product.setCustomer(customer);
-        Category category = categoryRepository.findByName(productCreateDto.getCategory());
         product.setCategory(category);
         productRepository.save(product);
         return product;
     }
 
-    public ProductDetailsDto productDetails(Long id, String username){
-        Product product = productRepository.findById(id).get();
+    //TODO
+    public ProductDetailsDto productDetails(Long productId, String username){
+        Product updateProduct = getProductById(productId);
+        var views = updateProduct.getView();
+
+        Customer customer = customerService.getCustomerByUsername(username);
+
+        updateProduct.setView(views + 1);
+        productRepository.save(updateProduct);
+        Product product = productRepository.findById(productId).get();
+
         ProductDetailsDto productDetailsDto = new ProductDetailsDto();
-        productDetailsDto.setId(product.getId());
+        productDetailsDto.setProductId(product.getId());
+        productDetailsDto.setCategoryId(product.getCategory().getId());
+        productDetailsDto.setViews(product.getView());
         productDetailsDto.setTitle(product.getTitle());
         productDetailsDto.setDescription(product.getDescription());
         productDetailsDto.setPrice(product.getPrice());
@@ -72,30 +96,42 @@ public class ProductService {
         productDetailsDto.setCreatorId(product.getCustomer().getId());
         productDetailsDto.setCreatorName(product.getCustomer().getName());
         productDetailsDto.setCreatorPhone(product.getCustomer().getMobileNumber());
-        User user = userRepository.findByUsername(username);
         productDetailsDto.setCreatorEmail(product.getCustomer().getUser().getEmail());
 
         RecentlyViewedProduct recentlyViewedProduct = new RecentlyViewedProduct();
         recentlyViewedProduct.setProduct(product);
         recentlyViewedProduct.setViewedAt(LocalDateTime.now());
         recentlyViewedProduct.setCustomer(product.getCustomer());
+        recentlyViewedProductRepository.save(recentlyViewedProduct);
+
         return productDetailsDto;
     }
 
-    public void deactivateProduct(Long id){
-        Optional<Product> product = productRepository.findById(id);
-        product.get().setActive(false);
-        productRepository.save(product.get());
-
+    public void deactivateProduct(Long id, String username){
+        Customer customer = customerService.getCustomerByUsername(username);
+        Product product = getProductById(id);
+        if(productRepository.ProductWithCustomerExists(id, customer) == null){
+            throw new ProductWithCustomerNotFoundException();
+        }
+        product.setActive(false);
+        productRepository.save(product);
     }
-    public Product updateProduct(Long productId, Long customerId, ProductCreateDto productCreateDto) {
-        Product product = productRepository.findById(productId).get();
+
+    public Product updateProduct(Long productId, String username, ProductCreateDto productCreateDto) {
+        Product product = getProductById(productId);
+        Customer customer = customerService.getCustomerByUsername(username);
+        if(productRepository.ProductWithCustomerExists(productId, customer) == null){
+            throw new ProductWithCustomerNotFoundException();
+        }
+        Category category = categoryRepository.findByName(productCreateDto.getCategory());
+        if(category == null){
+            throw new CategoryNotFoundException(productCreateDto.getCategory());
+        }
 
         product.setTitle(productCreateDto.getTitle());
         product.setDescription(productCreateDto.getDescription());
         product.setPrice(productCreateDto.getPrice());
         product.setLocation(productCreateDto.getLocation());
-        Category category = categoryRepository.findByName(productCreateDto.getCategory());
         product.setCategory(category);
         product.setImageUrl(productCreateDto.getImage());
         product.setStatus(productCreateDto.getStatus());

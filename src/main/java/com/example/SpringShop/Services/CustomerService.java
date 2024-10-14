@@ -1,11 +1,13 @@
 package com.example.SpringShop.Services;
 
 import com.example.SpringShop.Constants.UserRoleConstants;
-import com.example.SpringShop.Dto.*;
 import com.example.SpringShop.Dto.Customer.*;
-import com.example.SpringShop.Entities.*;
+import com.example.SpringShop.Dto.Customer.CustomerDetailsDto;
+import com.example.SpringShop.Entities.Cart;
+import com.example.SpringShop.Entities.Customer;
+import com.example.SpringShop.Entities.RecentSearch;
+import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.EntityMappers.CustomerMapper;
-import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.CartRepository;
 import com.example.SpringShop.Repositories.CustomerRepository;
@@ -32,7 +34,6 @@ public class CustomerService {
     private final JWTUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
-    private final ProductService productService;
     private final CartRepository cartRepository;
     private final UserService userService;
 
@@ -42,15 +43,13 @@ public class CustomerService {
                            PasswordEncoder passwordEncoder,
                            JWTUtil jwtUtil,
                            AuthenticationManager authenticationManager,
-                           UserDetailsService userDetailsService,
-                           ProductService productService, CartRepository cartRepository, UserService userService) {
+                           UserDetailsService userDetailsService, CartRepository cartRepository, UserService userService) {
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
-        this.productService = productService;
         this.cartRepository = cartRepository;
         this.userService = userService;
     }
@@ -95,8 +94,6 @@ public class CustomerService {
         }
         catch(BadCredentialsException e){
             throw new InvalidCredentialsException();
-        }catch(Exception e){
-            throw new RuntimeException("An unexpected error occurred with logging in user.");
         }
     }
 
@@ -122,7 +119,6 @@ public class CustomerService {
         if (!passwordEncoder.matches(changePasswordDto.getOldPassword(),user.getPassword())){
             throw new InvalidPasswordException();
         }
-
         if(passwordEncoder.matches(changePasswordDto.getNewPassword(),user.getPassword())){
             throw new PasswordMismatchException();
         }
@@ -133,7 +129,7 @@ public class CustomerService {
 
     public CustomerDetailsDto getCustomerDetails(String username){
         User user = userService.getUserByUsername(username);
-        Customer customer = customerRepository.findByUser(user);
+        Customer customer = getCustomerByUsername(username);
 
         return CustomerMapper.toCustomerDetailsDto(customer);
     }

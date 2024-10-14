@@ -8,8 +8,9 @@ import jakarta.validation.constraints.Size;
 
 @PasswordMatches
 public class RegisterDto {
+
     @NotBlank(message = "Mobile number is required.")
-    @Pattern(regexp = "^\\d{10}$", message = "Old mobile number must be exactly 10 digits.")
+    @Pattern(regexp = "^\\d{10}$", message = "Mobile number must be exactly 10 digits.")
     private String mobileNumber;
 
     @NotBlank(message = "Name is required.")
@@ -28,6 +29,16 @@ public class RegisterDto {
     @NotBlank(message = "Email is required.")
     @Email(message = "Email should be valid.")
     private String email;
+
+    public RegisterDto() {}
+    public RegisterDto(String mobileNumber, String name, String username, String password, String confirmPassword, String email) {
+        this.mobileNumber = mobileNumber;
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.email = email;
+    }
 
     public String getMobileNumber() {return mobileNumber;}
 
