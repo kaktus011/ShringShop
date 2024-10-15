@@ -1,7 +1,7 @@
 package com.example.SpringShop.EntityMappers;
 
 import com.example.SpringShop.Dto.Product.ProductIndexDto;
-import com.example.SpringShop.Dto.ProductViewDto;
+import com.example.SpringShop.Dto.Product.ProductViewDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
 import com.example.SpringShop.Entities.Product;
 
@@ -23,13 +23,17 @@ public class ProductMapper {
                 product.getTitle(),
                 product.getDescription(),
                 product.getPrice(),
+                product.getCategory().getId(),
                 product.getCategory().getName(),
                 product.getImageUrl(),
                 product.getStatus(),
                 product.getLocation(),
+                product.getView() ,
                 product.getCustomer().getId(),
                 product.getCustomer().getName(),
-                product.getCustomer().getMobileNumber()
+                product.getCustomer().getMobileNumber(),
+                product.getCustomer().getUser().getEmail(),
+                product.getCustomersWhoFavourited().size()
         );
     }
 
@@ -48,6 +52,7 @@ public class ProductMapper {
         dto.setViews(product.getView());
         dto.setActive(product.isActive());
         dto.setCreationDate(product.getCreationDate());
+        dto.setCustomersWhoFavourited(product.getCustomersWhoFavourited().size());
 
         return dto;
     }

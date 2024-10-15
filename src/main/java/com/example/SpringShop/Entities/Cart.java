@@ -2,6 +2,7 @@ package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Cart {
             joinColumns = @JoinColumn(name = "cart_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
-    private List<Product> products;
+    private List<Product> products =  new ArrayList<>();
 
     @Column(name = "total_price")
     private Double totalPrice;

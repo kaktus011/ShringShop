@@ -2,7 +2,6 @@ package com.example.SpringShop.Dto.Customer;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 public class ChangeMobileNumberDto {
     @NotBlank(message= "Old mobile number is required.")

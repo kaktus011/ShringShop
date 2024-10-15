@@ -2,10 +2,7 @@ package com.example.SpringShop.Controllers;
 
 import com.example.SpringShop.Dto.Cart.CartViewDto;
 import com.example.SpringShop.Dto.ErrorResponseDto;
-import com.example.SpringShop.Exceptions.CartNotFoundException;
-import com.example.SpringShop.Exceptions.CustomerNotFoundException;
-import com.example.SpringShop.Exceptions.InvalidProductException;
-import com.example.SpringShop.Exceptions.UserNotFoundException;
+import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Services.CartService;
 import com.example.SpringShop.Services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +31,11 @@ public class CartController {
         try {
             Long customerId = customerService.getCustomerId(username);
             CartViewDto cartViewDto = cartService.getCartForCustomer(customerId);
+            if (cartViewDto == null) {
+                throw new CartNotFoundException();
+            }
             return ResponseEntity.ok(cartViewDto);
-        } catch (CustomerNotFoundException | CartNotFoundException ex) {
+        } catch (CustomerNotFoundException | UserNotFoundException | CartNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception ex) {
@@ -69,7 +69,8 @@ public class CartController {
             Long customerId = customerService.getCustomerId(username);
             CartViewDto cartViewDto = cartService.deleteProductFromCart(customerId, id);
             return ResponseEntity.ok(cartViewDto);
-        } catch (CustomerNotFoundException | UserNotFoundException | InvalidProductException | CartNotFoundException ex) {
+        } catch (CustomerNotFoundException | UserNotFoundException | InvalidProductException | CartNotFoundException |
+                 ProductNotInCartException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred with deleting a product from the cart");
@@ -83,7 +84,7 @@ public class CartController {
 
         try {
             Long customerId = customerService.getCustomerId(username);
-            CartViewDto cartViewDto = cartService.clearcart(customerId);
+            CartViewDto cartViewDto = cartService.clearCart(customerId);
             return ResponseEntity.ok(cartViewDto);
         } catch (CustomerNotFoundException | UserNotFoundException | InvalidProductException | CartNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());

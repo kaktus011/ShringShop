@@ -1,6 +1,6 @@
 package com.example.SpringShop.Dto.Home;
 
-import com.example.SpringShop.Dto.ProductViewDto;
+import com.example.SpringShop.Dto.Product.ProductViewDto;
 
 import java.util.List;
 

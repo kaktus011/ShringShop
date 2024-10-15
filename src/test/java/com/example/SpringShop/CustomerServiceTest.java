@@ -4,6 +4,7 @@ package com.example.SpringShop;
 import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
+import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.*;
 import com.example.SpringShop.Services.*;
@@ -46,6 +47,9 @@ public class CustomerServiceTest {
 
     @Mock
     private JWTUtil jwtUtil;
+
+    @Mock
+    private CustomerMapper customerMapper;
 
     @InjectMocks
     private CustomerService customerService;
@@ -205,20 +209,31 @@ public class CustomerServiceTest {
 
     @Test
     void testChangePassword_Success() {
-        String oldPassword = "oldPassword";
-        String newPassword = "newPassword";
+        String username = "testUsername";
 
-        ChangePasswordDto changePasswordDto = new ChangePasswordDto(oldPassword, newPassword, newPassword);
+        ChangePasswordDto changePasswordDto = new ChangePasswordDto("oldPassword", "newPassword", "newPassword");
 
         User mockUser = new User();
-        mockUser.setUsername("currentUsername");
-        mockUser.setPassword(passwordEncoder.encode(oldPassword));
+        mockUser.setUsername(username);
+        mockUser.setPassword("encodedOldPassword");
 
-        when(userService.getUserByUsername("currentUsername")).thenReturn(mockUser);
+        Customer mockCustomer = new Customer();
+        mockCustomer.setId(1L);
+        mockCustomer.setUser(mockUser);
 
-        Customer updatedCustomer = customerService.changePassword(changePasswordDto, "currentUsername");
-        assertNotNull(updatedCustomer);
-        assertTrue(passwordEncoder.matches(newPassword, mockUser.getPassword()));
+        when(userService.getUserByUsername(username)).thenReturn(mockUser);
+        when(passwordEncoder.matches("oldPassword", mockUser.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches("newPassword", mockUser.getPassword())).thenReturn(false);
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        when(userRepository.save(mockUser)).thenReturn(mockUser);
+        when(customerRepository.findByUser(mockUser)).thenReturn(mockCustomer);
+
+        Customer result = customerService.changePassword(changePasswordDto, username);
+
+        assertNotNull(result);
+        assertEquals(mockCustomer, result);
+        assertEquals("encodedNewPassword", mockUser.getPassword());
+        verify(userRepository).save(mockUser);
     }
 
     @Test
@@ -236,27 +251,22 @@ public class CustomerServiceTest {
 
     @Test
     void testGetCustomerDetails_Success() {
-        // Arrange
-        String username = "currentUsername";
+        String username = "testUsername";
         User mockUser = new User();
         mockUser.setUsername(username);
-
         Customer mockCustomer = new Customer();
-        mockCustomer.setUser(mockUser);
         mockCustomer.setId(1L);
-        mockCustomer.setName("Test");
+        mockCustomer.setUser(mockUser);
+        CustomerDetailsDto expectedCustomerDetailsDto = new CustomerDetailsDto();
+        expectedCustomerDetailsDto.setUsername(username);
+        expectedCustomerDetailsDto.setId(1L);
 
-        // Set up mocks
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
-        when(customerRepository.findByUser(mockUser)).thenReturn(mockCustomer);
+        when(customerService.getCustomerByUsername(username)).thenReturn(mockCustomer);
 
-        // Act
         CustomerDetailsDto result = customerService.getCustomerDetails(username);
-
-        // Assert
         assertNotNull(result);
-        assertEquals(mockCustomer.getId(), result.getId());
-        assertEquals(mockCustomer.getName(), result.getName());
+        assertEquals(expectedCustomerDetailsDto, result);
     }
 
     @Test

@@ -128,7 +128,6 @@ public class CustomerService {
     }
 
     public CustomerDetailsDto getCustomerDetails(String username){
-        User user = userService.getUserByUsername(username);
         Customer customer = getCustomerByUsername(username);
 
         return CustomerMapper.toCustomerDetailsDto(customer);
@@ -173,25 +172,9 @@ public class CustomerService {
     }
 
     public Customer getCustomerByUsername(String username){
-        User user = userRepository.findByUsername(username);
-        if (user == null){
-            throw new RuntimeException("User not found");
-        }
-
-        return customerRepository.findByUser(user);
-    }
-
-    public List<String> getRecentSearches(String username){
         User user = userService.getUserByUsername(username);
 
-        Customer customer = customerRepository.findByUser(user);
-        return customer.getRecentSearches().stream()
-                .map(RecentSearch::getSearchName)
-                .collect(Collectors.toList());
-    }
-
-    public List<String> getTop10MostSearched() {
-        return customerRepository.findTop10MostSearched();
+        return customerRepository.findByUser(user);
     }
 
     public Long getCustomerId(String username){

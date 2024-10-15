@@ -2,6 +2,7 @@ package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,15 +24,10 @@ public class Customer {
     private String name;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "customer_favourite_products",
-            joinColumns = @JoinColumn(name = "customer_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private List<Product> favouriteProducts;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<CustomerFavouriteProduct> favouriteProducts = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -39,7 +35,7 @@ public class Customer {
             joinColumns =  @JoinColumn(name = "customer_id"),
             inverseJoinColumns = @JoinColumn(name = "recent_search_id")
     )
-    private List<RecentSearch> recentSearches;
+    private List<RecentSearch> recentSearches =  new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<RecentlyViewedProduct> recentlyViewedProducts;
@@ -59,13 +55,19 @@ public class Customer {
 
     public User getUser() {return user;}
 
+    public void setUser(User user) {this.user = user;}
+
     public String getMobileNumber() {return mobileNumber;}
 
     public String getName() {return name;}
 
+    public void setName(String name) {this.name = name;}
+
     public List<Order> getOrders() {return orders;}
 
-    public List<Product> getFavouriteProducts() {return favouriteProducts;}
+    public List<CustomerFavouriteProduct> getFavouriteProducts() {return favouriteProducts;}
+
+    public void setFavouriteProducts(List<CustomerFavouriteProduct> favouriteProducts) {this.favouriteProducts = favouriteProducts;}
 
     public List<RecentSearch> getRecentSearches() {return recentSearches;}
 
@@ -75,17 +77,15 @@ public class Customer {
 
     public List<Product> getProducts() {return products;}
 
+    public void setProducts(List<Product> products) {this.products = products;}
+
     public Cart getCart() {return cart;}
 
-    public void setUser(User user) {this.user = user;}
+    public void setCart(Cart cart) {this.cart = cart;}
 
     public void setMobileNumber(String mobileNumber) {this.mobileNumber = mobileNumber;}
 
-    public void setName(String name) {this.name = name;}
-
     public void setOrders(List<Order> orders) {this.orders = orders;}
-
-    public void setFavouriteProducts(List<Product> favouriteProducts) {this.favouriteProducts = favouriteProducts;}
 
     public void setRecentSearches(List<RecentSearch> recentSearches) {this.recentSearches = recentSearches;}
 
@@ -93,7 +93,5 @@ public class Customer {
 
     public void setMessages(List<Message> messages) {this.messages = messages;}
 
-    public void setProducts(List<Product> products) {this.products = products;}
 
-    public void setCart(Cart cart) {this.cart = cart;}
 }

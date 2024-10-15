@@ -3,7 +3,7 @@ package com.example.SpringShop.Controllers;
 import com.example.SpringShop.Dto.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductCreateDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
-import com.example.SpringShop.Dto.ProductViewDto;
+import com.example.SpringShop.Dto.Product.ProductViewDto;
 import com.example.SpringShop.Entities.Product;
 import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Exceptions.*;
@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/products")
 public class ProductController {
 
     private final CustomerService customerService;

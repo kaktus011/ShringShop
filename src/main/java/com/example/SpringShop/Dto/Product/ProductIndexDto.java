@@ -1,9 +1,5 @@
 package com.example.SpringShop.Dto.Product;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
 import java.time.LocalDateTime;
 
 public class ProductIndexDto {
@@ -18,6 +14,7 @@ public class ProductIndexDto {
     private String image;
     private Long customerId;
     private int views;
+    private int customersWhoFavourited;
     private boolean isActive;
     private LocalDateTime creationDate;
 
@@ -65,6 +62,9 @@ public class ProductIndexDto {
     public int getViews() {return views;}
 
     public void setViews(int views) {this.views = views;}
+
+    public int getCustomersWhoFavourited() {return customersWhoFavourited;}
+    public void setCustomersWhoFavourited(int customersWhoFavourited) {}
 
     public boolean isActive() {return isActive;}
 

@@ -7,6 +7,7 @@ import com.example.SpringShop.Exceptions.UserNotFoundException;
 import com.example.SpringShop.Services.CategoryService;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.ProductService;
+import com.example.SpringShop.Services.RecentSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +26,17 @@ public class HomeController {
     private final CategoryService categoryService;
     private final CustomerService customerService;
     private final ProductService productService;
+    private final RecentSearchService recentSearchService;
 
     @Autowired
-    public HomeController(CategoryService categoryService, ProductService productService, CustomerService customerService) {
+    public HomeController(CategoryService categoryService, ProductService productService, CustomerService customerService, RecentSearchService recentSearchService) {
         this.categoryService = categoryService;
         this.productService = productService;
         this.customerService = customerService;
+        this.recentSearchService = recentSearchService;
     }
 
+    //TODO
     @GetMapping
     public ResponseEntity<?> loadHome() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,8 +45,8 @@ public class HomeController {
             Long customerId = customerService.getCustomerId(username);
 
             var products = productService.getLast10ViewedProducts(customerId);
-            List<String> recentSearches = customerService.getRecentSearches(username);
-            List<String> popularSearches = customerService.getTop10MostSearched();
+            List<String> recentSearches = recentSearchService.getRecentSearches(username);
+            List<String> popularSearches = recentSearchService.getTop10MostSearched();
 
             HomepageViewDto dto = new HomepageViewDto(categoryService.getAllCategoryNames(), products, recentSearches, popularSearches);
             return ResponseEntity.ok(dto);

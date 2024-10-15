@@ -2,7 +2,6 @@ package com.example.SpringShop;
 
 import com.example.SpringShop.Controllers.CustomerController;
 import com.example.SpringShop.Dto.Customer.*;
-import com.example.SpringShop.Dto.ErrorResponseDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Exceptions.*;
@@ -41,9 +40,6 @@ public class CustomerControllerTest {
     private UserService userService;
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private CustomerRepository customerRepository;
 
     @Mock
     private Authentication authentication;

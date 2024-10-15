@@ -2,16 +2,12 @@ package com.example.SpringShop.Services;
 
 import com.example.SpringShop.Dto.Product.ProductCreateDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
-import com.example.SpringShop.Dto.ProductViewDto;
+import com.example.SpringShop.Dto.Product.ProductViewDto;
 import com.example.SpringShop.Entities.*;
 import com.example.SpringShop.EntityMappers.ProductMapper;
-import com.example.SpringShop.Exceptions.CategoryNotFoundException;
-import com.example.SpringShop.Exceptions.CustomerNotFoundException;
-import com.example.SpringShop.Exceptions.InvalidProductException;
-import com.example.SpringShop.Exceptions.ProductWithCustomerNotFoundException;
+import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.PageImpl;
@@ -32,9 +28,10 @@ public class ProductService {
     private final RecentSearchRepository recentSearchRepository;
     private final RecentlyViewedProductRepository recentlyViewedProductRepository;
     private final CustomerService customerService;
+    private final CustomerFavouriteProductRepository customerFavouriteProductRepository;
 
     @Autowired
-    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository, RecentlyViewedProductRepository recentlyViewedProductRepository, CustomerService customerService) {
+    public ProductService(CustomerRepository customerRepository, ProductRepository productRepository, CategoryRepository categoryRepository, UserRepository userRepository, RecentSearchRepository recentSearchRepository, RecentlyViewedProductRepository recentlyViewedProductRepository, CustomerService customerService, CustomerFavouriteProductRepository customerFavouriteProductRepository) {
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
@@ -42,6 +39,7 @@ public class ProductService {
         this.recentSearchRepository = recentSearchRepository;
         this.recentlyViewedProductRepository = recentlyViewedProductRepository;
         this.customerService = customerService;
+        this.customerFavouriteProductRepository = customerFavouriteProductRepository;
     }
 
     public Product createProduct(Long customerId, ProductCreateDto productCreateDto){
@@ -71,38 +69,29 @@ public class ProductService {
         return product;
     }
 
-    //TODO
-    public ProductDetailsDto productDetails(Long productId, String username){
-        Product updateProduct = getProductById(productId);
-        var views = updateProduct.getView();
-
+    public ProductDetailsDto productDetails(Long productId, String username) {
+        Product product = getProductById(productId);
         Customer customer = customerService.getCustomerByUsername(username);
 
-        updateProduct.setView(views + 1);
-        productRepository.save(updateProduct);
-        Product product = productRepository.findById(productId).get();
+        Optional<RecentlyViewedProduct> recentlyViewed = recentlyViewedProductRepository.findByProductIdAndCustomer(productId, customer);
 
-        ProductDetailsDto productDetailsDto = new ProductDetailsDto();
-        productDetailsDto.setProductId(product.getId());
-        productDetailsDto.setCategoryId(product.getCategory().getId());
-        productDetailsDto.setViews(product.getView());
-        productDetailsDto.setTitle(product.getTitle());
-        productDetailsDto.setDescription(product.getDescription());
-        productDetailsDto.setPrice(product.getPrice());
-        productDetailsDto.setLocation(product.getLocation());
-        productDetailsDto.setCategory(product.getCategory().getName());
-        productDetailsDto.setImage(product.getImageUrl());
-        productDetailsDto.setStatus(product.getStatus());
-        productDetailsDto.setCreatorId(product.getCustomer().getId());
-        productDetailsDto.setCreatorName(product.getCustomer().getName());
-        productDetailsDto.setCreatorPhone(product.getCustomer().getMobileNumber());
-        productDetailsDto.setCreatorEmail(product.getCustomer().getUser().getEmail());
+        RecentlyViewedProduct recentlyViewedProduct;
+        if (recentlyViewed.isPresent()) {
+            recentlyViewedProduct = recentlyViewed.get();
+            recentlyViewedProduct.setViewedAt(LocalDateTime.now());
+        } else {
+            recentlyViewedProduct = new RecentlyViewedProduct();
+            recentlyViewedProduct.setProduct(product);
+            recentlyViewedProduct.setCustomer(customer);
+            recentlyViewedProduct.setViewedAt(LocalDateTime.now());
+            product.setView(product.getView() + 1);
+            productRepository.save(product);
+        }
 
-        RecentlyViewedProduct recentlyViewedProduct = new RecentlyViewedProduct();
-        recentlyViewedProduct.setProduct(product);
-        recentlyViewedProduct.setViewedAt(LocalDateTime.now());
-        recentlyViewedProduct.setCustomer(product.getCustomer());
         recentlyViewedProductRepository.save(recentlyViewedProduct);
+
+        ProductDetailsDto productDetailsDto = new ProductDetailsDto(product.getId(), product.getTitle(), product.getDescription(), product.getPrice(), product.getCategory().getId(), product.getCategory().getName(), product.getImageUrl(), product.getStatus(), product.getLocation(), product.getView() , product.getCustomer().getId(), product.getCustomer().getName(), product.getCustomer().getMobileNumber(), product.getCustomer().getUser().getEmail(), product.getCustomersWhoFavourited().size());
+
 
         return productDetailsDto;
     }
@@ -194,15 +183,33 @@ public class ProductService {
     }
 
     public List<ProductViewDto> getFavouriteProducts(Customer customer) {
-        return customer.getFavouriteProducts().stream()
-                .map(ProductMapper::toProductViewDto)
+        // Fetch the favourite products associated with the customer using the relationship table
+        List<CustomerFavouriteProduct> favouriteProducts = customerFavouriteProductRepository.findByCustomerId(customer.getId());
+
+        // Map to ProductViewDto
+        return favouriteProducts.stream()
+                .map(favourite -> ProductMapper.toProductViewDto(favourite.getProduct()))
                 .collect(Collectors.toList());
     }
 
     public void makeProductFavourite(Customer customer, Long productId) {
         Product product = getProductById(productId);
-        customer.getFavouriteProducts().add(product);
-        customerRepository.save(customer);
+
+        if (product.getCustomer().equals(customer)) {
+            throw new CannotAddToFavouritesException("Cannot favorite your own product.");
+        }
+
+        if (customer.getFavouriteProducts().stream()
+                .noneMatch(fav -> fav.getProduct().equals(product))) {
+
+            CustomerFavouriteProduct favourite = new CustomerFavouriteProduct();
+            favourite.setCustomer(customer);
+            favourite.setProduct(product);
+
+            customer.getFavouriteProducts().add(favourite);
+            product.getCustomersWhoFavourited().add(favourite);
+            customerRepository.save(customer);
+        }
     }
 
     public void deleteFavouriteProduct(Customer customer, Long productId) {

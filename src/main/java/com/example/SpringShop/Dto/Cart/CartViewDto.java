@@ -1,6 +1,6 @@
 package com.example.SpringShop.Dto.Cart;
 
-import com.example.SpringShop.Dto.ProductInCartDto;
+import com.example.SpringShop.Dto.Product.ProductInCartDto;
 
 import java.util.List;
 

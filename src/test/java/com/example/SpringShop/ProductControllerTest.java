@@ -26,7 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -54,7 +54,7 @@ private CategoryRepository categoryRepository  ;
 private RecentlyViewedProductRepository recentlyViewedProductRepository;
 
 @Mock
-    private ProductMapper productMapper;
+private ProductMapper productMapper;
 
 private Authentication authentication;
 
@@ -92,6 +92,7 @@ public void setUp() {
         mockProduct.setCreationDate(LocalDateTime.now());
         mockProduct.setCustomer(new Customer());
         mockProduct.setCategory(category);
+
 
         when(productService.createProduct(customerId, productCreateDto)).thenReturn(mockProduct);
 
@@ -262,45 +263,81 @@ public void testDeactivateProduct_ProductWithCustomerNotFoundException() {
     assertEquals("Customer does not have access to this product.", ((ErrorResponseDto) response.getBody()).getMessage());
 }
     @Test
-    void testUpdateProduct_Success() {
+    public void testUpdateProduct_Success() {
         Long productId = 1L;
-        String username = "currentUsername";
-        ProductCreateDto productCreateDto = new ProductCreateDto();
-        productCreateDto.setCategory("Category");
-        Category mockCategory = new Category();
-        mockCategory.setName("Category");
-
-        User mockUser = new User();
-        mockUser.setUsername(username);
-        Customer mockCustomer = new Customer();
-        mockCustomer.setId(1L);
-        mockCustomer.setUser(mockUser);
-
+Category category = new Category();
+category.setName("Category Name");
         Product mockProduct = new Product();
-        mockProduct.setId(productId);
-        mockProduct.setCategory(mockCategory);
-        mockProduct.setTitle("Sample Product");
-        mockProduct.setDescription("Sample Description");
-        mockProduct.setLocation("Sample Location");
-        mockProduct.setStatus("Available");
-        mockProduct.setImageUrl("sampleImageUrl");
-        mockProduct.setPrice(100.0);
+        mockProduct.setId(1L);
+        mockProduct.setTitle("Title");
+        mockProduct.setDescription("Test description");
+        mockProduct.setLocation("Test location");
+        mockProduct.setStatus("Test status");
+        mockProduct.setImageUrl("test");
+        mockProduct.setPrice(20L);
         mockProduct.setView(0);
         mockProduct.setActive(true);
         mockProduct.setCreationDate(LocalDateTime.now());
+        mockProduct.setCustomer(new Customer());
+        mockProduct.setCategory(category);
 
-        ProductIndexDto expectedProductDto = new ProductIndexDto();
-        expectedProductDto.setCategoryId(productId);
-        expectedProductDto.setCategory(mockCategory.getName());
-        expectedProductDto.setTitle(mockProduct.getTitle());
-        expectedProductDto.setDescription(mockProduct.getDescription());
-        when(authentication.getName()).thenReturn(username);
-        when(productService.updateProduct(productId, username, productCreateDto)).thenReturn(mockProduct);
-        when(ProductMapper.toProductIndexDto(mockProduct)).thenReturn(expectedProductDto);
+        // Mock ProductCreateDto with updated values
+        ProductCreateDto productCreateDto = new ProductCreateDto();
+        productCreateDto.setTitle("Updated Title");
+        productCreateDto.setDescription("Updated Description");
+        productCreateDto.setPrice(150.0);
+        productCreateDto.setLocation("Updated Location");
+        productCreateDto.setCategory("Category Name");
+        productCreateDto.setImage("updatedImageUrl");
+        productCreateDto.setStatus("Available");
+
+        // Mock repository methods
+        when(productRepository.findById(productId)).thenReturn(Optional.of(mockProduct));
+        when(customerService.getCustomerByUsername("testUser")).thenReturn(new Customer());
+        when(productRepository.ProductWithCustomerExists(productId, new Customer())).thenReturn(mockProduct);
+        when(categoryRepository.findByName("Category Name")).thenReturn(new Category());
+
+        // Call the update method
+        Product updatedProduct = productService.updateProduct(productId, "testUser", productCreateDto);
+
+        // Assertions to verify the updated product
+        assertNotNull(updatedProduct);
+        assertEquals("Updated Title", updatedProduct.getTitle());
+        assertEquals("Updated Description", updatedProduct.getDescription());
+        assertEquals(150.0, updatedProduct.getPrice());
+        assertEquals("Updated Location", updatedProduct.getLocation());
+        assertEquals("updatedImageUrl", updatedProduct.getImageUrl());
+        assertEquals("Available", updatedProduct.getStatus());
+
+        // Verify that the product is saved
+        verify(productRepository).save(updatedProduct);
+    }
+
+
+    @Test
+    public void testUpdateProduct_UserNotFoundException() {
+        Long productId = 1L;
+        var productCreateDto = new ProductCreateDto();
+        when(productService.updateProduct(productId, "testUser", productCreateDto)).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = productController.updateProduct(productId, productCreateDto);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(expectedProductDto, response.getBody());
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("User not found", ((ErrorResponseDto) response.getBody()).getMessage());
+    }
+
+    @Test
+    public void testUpdateProduct_ProductWithCustomerNotFoundException() {
+        Long productId = 1L;
+        var productCreateDto = new ProductCreateDto();
+
+        when(productService.updateProduct(productId, "testUser", productCreateDto)).thenThrow(new ProductWithCustomerNotFoundException());
+
+        ResponseEntity<?> response = productController.updateProduct(productId, productCreateDto);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Product with customer not found", ((ErrorResponseDto) response.getBody()).getMessage());
     }
 }
+
+

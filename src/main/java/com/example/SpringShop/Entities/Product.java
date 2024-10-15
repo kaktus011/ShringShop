@@ -3,6 +3,7 @@ package com.example.SpringShop.Entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -44,8 +45,8 @@ public class Product {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @ManyToMany(mappedBy = "favouriteProducts")
-    private List<Customer> customersWhoFavourited;
+    @OneToMany(mappedBy = "product")
+    private List<CustomerFavouriteProduct> customersWhoFavourited = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name ="category_id", nullable = false)
@@ -92,9 +93,9 @@ public class Product {
 
     public void setCustomer(Customer customer) {this.customer = customer;}
 
-    public List<Customer> getCustomersWhoFavourited() {return customersWhoFavourited;}
+    public List<CustomerFavouriteProduct> getCustomersWhoFavourited() {return customersWhoFavourited;}
 
-    public void setCustomersWhoFavourited(List<Customer> customersWhoFavourited) {this.customersWhoFavourited = customersWhoFavourited;}
+    public void setCustomersWhoFavourited(List<CustomerFavouriteProduct> customersWhoFavourited) {this.customersWhoFavourited = customersWhoFavourited;}
 
     public Category getCategory() {return category;}
 

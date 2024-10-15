@@ -15,24 +15,29 @@ public class ProductDetailsDto {
     private String creatorName;
     private String creatorPhone;
     private String creatorEmail;
+    private int customersWhoFavourited;
 
 
     public ProductDetailsDto() {
     }
 
 
-    public ProductDetailsDto(long id, String title, String description, double price, String category, String image, String status, String location, long creatorId, String creatorName, String creatorPhone) {
-        this.productId = id;
+    public ProductDetailsDto(long productId, String title, String description, double price, Long categoryId, String category, String image, String status, String location, int views, long creatorId, String creatorName, String creatorPhone, String creatorEmail, int customersWhoFavourited) {
+        this.productId = productId;
         this.title = title;
         this.description = description;
         this.price = price;
+        this.categoryId = categoryId;
         this.category = category;
         this.image = image;
         this.status = status;
         this.location = location;
+        this.views = views;
         this.creatorId = creatorId;
         this.creatorName = creatorName;
         this.creatorPhone = creatorPhone;
+        this.creatorEmail = creatorEmail;
+        this.customersWhoFavourited = customersWhoFavourited;
     }
 
     public long getProductId() {
@@ -81,7 +86,7 @@ public class ProductDetailsDto {
 
     public int getViews() {return  views;}
 
-    public void setViews(int views) {}
+    public void setViews(int views) {this.views = views; }
 
     public String getStatus() {
         return status;
@@ -100,6 +105,7 @@ public class ProductDetailsDto {
     }
 
     public String getImage() {return image;}
+
     public void setImage(String image) {this.image = image;}
 
     public long getCreatorId() {
@@ -129,4 +135,8 @@ public class ProductDetailsDto {
     public String getCreatorEmail() {return creatorEmail;}
 
     public void setCreatorEmail(String creatorEmail) {this.creatorEmail = creatorEmail;}
+
+    public int getCustomersWhoFavourited() {return customersWhoFavourited;}
+
+    public void setCustomersWhoFavourited(int customersWhoFavourited) {}
 }

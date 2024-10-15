@@ -27,16 +27,8 @@ public class CategoryService {
     public List<String> getAllCategoryNames() {
         return categoryRepository.findAll().stream()
                 .map(Category::getName)
+                .limit(10)
                 .collect(Collectors.toList());
-    }
-
-    public Category getCategoryByName(String name) {
-        Category categoryName = categoryRepository.findByName(name);
-        if (categoryName == null) {
-            throw new IllegalStateException("Category with name " + name + " does not exist");
-        }
-
-        return categoryName;
     }
 
 }
