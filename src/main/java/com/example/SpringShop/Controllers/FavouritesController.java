@@ -63,15 +63,15 @@ public class FavouritesController {
         }
     }
 
-    @PostMapping("/unfavorite-product")
-    public ResponseEntity<?> deleteFavouriteProduct(Long productId) {
+    @PostMapping("/unfavourite-product/{id}")
+    public ResponseEntity<?> deleteFavouriteProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         try {
             Customer customer = customerService.getCustomerByUsername(username);
-            productService.deleteFavouriteProduct(customer, productId);
-            return ResponseEntity.ok("Product removed from favourites");
+            productService.deleteFavouriteProduct(customer, id);
+            return ResponseEntity.ok("Product removed from favourites!");
         } catch (CustomerNotFoundException | UserNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);

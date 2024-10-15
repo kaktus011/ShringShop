@@ -13,7 +13,8 @@ public class ProductMapper {
                 product.getTitle(),
                 product.getPrice(),
                 product.getImageUrl(),
-                product.getLocation()
+                product.getLocation(),
+                product.getCreationDate()
         );
     }
 

@@ -19,13 +19,11 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 public class CartService {
 
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
     private final ProductService productService;
 
     @Autowired
-    public CartService(CartRepository cartRepository, ProductRepository productRepository, ProductService productService) {
+    public CartService(CartRepository cartRepository, ProductService productService) {
         this.cartRepository = cartRepository;
-        this.productRepository = productRepository;
         this.productService = productService;
     }
 

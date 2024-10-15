@@ -183,10 +183,8 @@ public class ProductService {
     }
 
     public List<ProductViewDto> getFavouriteProducts(Customer customer) {
-        // Fetch the favourite products associated with the customer using the relationship table
         List<CustomerFavouriteProduct> favouriteProducts = customerFavouriteProductRepository.findByCustomerId(customer.getId());
 
-        // Map to ProductViewDto
         return favouriteProducts.stream()
                 .map(favourite -> ProductMapper.toProductViewDto(favourite.getProduct()))
                 .collect(Collectors.toList());
@@ -214,7 +212,17 @@ public class ProductService {
 
     public void deleteFavouriteProduct(Customer customer, Long productId) {
         Product product = getProductById(productId);
-        customer.getFavouriteProducts().remove(product);
+        CustomerFavouriteProduct favourite = customerFavouriteProductRepository.findByCustomerIdAndByProductId(customer.getId(), productId);
+
+        if (favourite == null) {
+            throw new ProductNotInFavouritesException("The product is not in your favourites.");
+        }
+
+        customer.getFavouriteProducts().remove(favourite);
+        product.getCustomersWhoFavourited().remove(favourite);
+        product.getCustomersWhoFavourited().remove(favourite);
+
+        customerFavouriteProductRepository.delete(favourite);
         customerRepository.save(customer);
     }
 

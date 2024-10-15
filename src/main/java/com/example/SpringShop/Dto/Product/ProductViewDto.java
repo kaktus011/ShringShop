@@ -11,12 +11,13 @@ public class ProductViewDto {
     private LocalDateTime createdAt;
 
     public ProductViewDto() {}
-    public ProductViewDto(long id, String title, double price, String image, String location) {
+    public ProductViewDto(long id, String title, double price, String image, String location, LocalDateTime createdAt) {
         this.id = id;
         this.title = title;
         this.price = price;
         this.image = image;
         this.location = location;
+        this.createdAt = createdAt;
     }
 
     public long getId() {
