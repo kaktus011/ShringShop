@@ -2,7 +2,7 @@ package com.example.SpringShop.Controllers;
 
 import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Dto.Customer.CustomerDetailsDto;
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
@@ -77,8 +77,10 @@ public class CustomerController {
             return ResponseEntity.ok(updatedCustomerDto);
         } catch (UserNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (WrongUsernameException | UsernameAlreadyTakenException ex) {
+        } catch (WrongUsernameException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (UsernameAlreadyTakenException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing username.");
         }
@@ -94,6 +96,8 @@ public class CustomerController {
             return ResponseEntity.ok(updatedCustomerDto);
         } catch (InvalidPasswordException | PasswordMismatchException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing password.");
         }
     }
 
@@ -107,6 +111,8 @@ public class CustomerController {
          }catch (UserNotFoundException | CustomerNotFoundException ex) {
              ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+         }catch (Exception ex) {
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with getting details.");
          }
     }
 
@@ -118,9 +124,11 @@ public class CustomerController {
             Customer updatedCustomer = customerService.changeMobileNumber(changeMobileNumberDto, username);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
             return ResponseEntity.ok(updatedCustomerDto);
-        } catch (InvalidMobileNumberException | NewNumberSameLikeOldNumberException | MobileNumberAlreadyTakenException ex) {
+        } catch (InvalidMobileNumberException | MobileNumberAlreadyTakenException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
-        } catch (Exception ex) {
+        } catch (NewNumberSameLikeOldNumberException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());}
+        catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing mobile number.");
         }
     }
@@ -133,9 +141,11 @@ public class CustomerController {
             Customer updatedCustomer = customerService.changeEmail(changeEmailDto, currentName);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
             return ResponseEntity.ok(updatedCustomerDto);
-        } catch (InvalidEmailException | NewEmailSameLikeOldEmailException | EmailAlreadyTakenException ex) {
+        } catch (InvalidEmailException | EmailAlreadyTakenException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
-        } catch (Exception ex) {
+        } catch (NewEmailSameLikeOldEmailException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing email.");
         }
     }

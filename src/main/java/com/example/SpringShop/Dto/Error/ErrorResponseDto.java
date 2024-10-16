@@ -1,4 +1,4 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Error;
 
 public class ErrorResponseDto {
     private String message;

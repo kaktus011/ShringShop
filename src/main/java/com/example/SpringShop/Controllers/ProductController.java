@@ -1,6 +1,6 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductCreateDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
 import com.example.SpringShop.Dto.Product.ProductViewDto;
@@ -42,6 +42,8 @@ public class ProductController {
         }catch (UserNotFoundException | CustomerNotFoundException | CategoryNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with creating a product.");
         }
     }
 
@@ -57,6 +59,9 @@ public class ProductController {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with retrieving product details.");
+        }
     }
 
     @PutMapping("/deactivate/{id}")
@@ -71,6 +76,22 @@ public class ProductController {
                 ProductWithCustomerNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with deactivating a product.");
+        }
+    }
+
+    @PutMapping("/deactivateFromAdmin/{id}")
+    public ResponseEntity<?> deactivateProductFromAdmin(@PathVariable Long id) {
+        try{
+            productService.deactivateProductFromAdmin(id);
+            return ResponseEntity.ok("Product marked as inactive successfully.");
+        }catch (UserNotFoundException | CustomerNotFoundException | InvalidProductException |
+                ProductWithCustomerNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with deactivating a product.");
         }
     }
 
@@ -87,6 +108,8 @@ public class ProductController {
                 ProductWithCustomerNotFoundException | CategoryNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with updating a product.");
         }
     }
 

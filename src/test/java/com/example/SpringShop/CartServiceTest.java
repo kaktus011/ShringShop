@@ -4,6 +4,7 @@ import com.example.SpringShop.Dto.Cart.CartViewDto;
 import com.example.SpringShop.Entities.Cart;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.Product;
+import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Exceptions.CartNotFoundException;
 import com.example.SpringShop.Exceptions.ProductNotInCartException;
 import com.example.SpringShop.Repositories.CartRepository;
@@ -18,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,17 +70,24 @@ public class CartServiceTest {
 
     @Test
     public void testAddProductToCart_Success() {
-        Product productToAdd = new Product();
-        productToAdd.setId(1L);
-        productToAdd.setPrice(100.0);
-        Customer customer = new Customer();
-        customer.setId(customerId);
-        when(cartRepository.findByCustomer_Id(customerId)).thenReturn(cart);
-        when(productService.getProductById(1L)).thenReturn(productToAdd);
+        cart = new Cart();
+        cart.setId(1L);
+        cart.setProducts(new ArrayList<>());
+        cart.setTotalPrice(0.0);
 
-        CartViewDto result = cartService.addProductToCart(customerId, 1L);
-        assertEquals(1, cart.getProducts().size());
-        assertEquals(cart.getId(), result.getCartId());
+        var product = new Product();
+        product.setId(1L);
+        product.setPrice(100.0);
+        Customer customer = new Customer();
+        customer.setId(1L);
+        Long productId = product.getId();
+        product.setCustomer(customer);
+
+        when(cartRepository.findByCustomer_Id(customerId)).thenReturn((cart));
+        when(productService.getProductById(productId)).thenReturn(product);
+
+        CartViewDto cartViewDto = cartService.addProductToCart(customerId, productId);
+        assertEquals(cartViewDto.getTotalPrice(), cart.getTotalPrice());
     }
 
     @Test

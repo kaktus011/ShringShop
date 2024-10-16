@@ -1,8 +1,7 @@
 package com.example.SpringShop;
 
 import com.example.SpringShop.Controllers.FavouritesController;
-import com.example.SpringShop.Controllers.ProductController;
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductViewDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
@@ -189,6 +188,119 @@ public class FavouritesControllerTest {
         assertEquals("An error occurred while retrieving favorite products.", response.getBody());
         verify(customerService, times(1)).getCustomerByUsername(username);
         verify(productService, never()).getFavouriteProducts(any());
+    }
+    @Test
+    public void testDeleteFavouriteProduct_Success() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        User user = new User();
+        user.setUsername("testUser");
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setUser(user);
+        when(customerService.getCustomerByUsername("testUser")).thenReturn(customer);
+        doNothing().when(productService).deleteFavouriteProduct(customer, 1L);
+
+        ResponseEntity<?> response = favouritesController.deleteFavouriteProduct(1L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Product removed from favourites!", response.getBody());
+    }
+
+    @Test
+    public void testDeleteFavouriteProduct_CustomerNotFound() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+        when(customerService.getCustomerByUsername("testUser"))
+                .thenThrow(new CustomerNotFoundException());
+
+        ResponseEntity<?> response = favouritesController.deleteFavouriteProduct(1L);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        ErrorResponseDto errorResponse = (ErrorResponseDto) response.getBody();
+        assertEquals("Customer not found.", errorResponse.getMessage());
+    }
+
+    @Test
+    public void testDeleteFavouriteProduct_InternalServerError() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        User user = new User();
+        user.setUsername("testUser");
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setUser(user);
+        when(customerService.getCustomerByUsername("testUser")).thenReturn(customer);
+        doThrow(new RuntimeException("Something went wrong"))
+                .when(productService).deleteFavouriteProduct(customer, 1L);
+
+        ResponseEntity<?> response = favouritesController.deleteFavouriteProduct(1L);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("An error occurred while deleting a product from favourites.", response.getBody());
+    }
+    @Test
+    public void testGetRecentProducts_Success() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        User user = new User();
+        user.setUsername("testUser");
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setUser(user);
+        when(customerService.getCustomerByUsername("testUser")).thenReturn(customer);
+
+        List<ProductViewDto> recentProducts = List.of(
+                new ProductViewDto(1L, "Product 1", 99.99, "image1.jpg", "Location 1", LocalDateTime.now()),
+                new ProductViewDto(2L, "Product 2", 99.99, "image1.jpg", "Location 1", LocalDateTime.now())
+        );
+        when(productService.getLast10ViewedProducts(1L)).thenReturn(recentProducts);
+
+        ResponseEntity<?> response = favouritesController.getRecentProducts();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<ProductViewDto> responseProducts = (List<ProductViewDto>) response.getBody();
+        assertEquals(2, responseProducts.size());
+        assertEquals("Product 1", responseProducts.get(0).getTitle());
+        assertEquals("Product 2", responseProducts.get(1).getTitle());
+    }
+
+    @Test
+    public void testGetRecentProducts_CustomerNotFound() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        when(authentication.getName()).thenReturn("testUser");
+        when(customerService.getCustomerByUsername("testUser"))
+                .thenThrow(new CustomerNotFoundException());
+
+        ResponseEntity<?> response = favouritesController.getRecentProducts();
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        ErrorResponseDto errorResponse = (ErrorResponseDto) response.getBody();
+        assertEquals("Customer not found.", errorResponse.getMessage());
+    }
+
+    @Test
+    public void testGetRecentProducts_InternalServerError() {
+        SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        User user = new User();
+        user.setUsername("testUser");
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setUser(user);
+        when(customerService.getCustomerByUsername("testUser")).thenReturn(customer);
+        when(productService.getLast10ViewedProducts(1L))
+                .thenThrow(new RuntimeException("Something went wrong"));
+
+        ResponseEntity<?> response = favouritesController.getRecentProducts();
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("An error occurred while retrieving last viewed products.", response.getBody());
     }
 }
 

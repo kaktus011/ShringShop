@@ -2,7 +2,7 @@ package com.example.SpringShop;
 
 
 import com.example.SpringShop.Controllers.HomeController;
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Home.HomepageViewDto;
 import com.example.SpringShop.Exceptions.CustomerNotFoundException;
 import com.example.SpringShop.Exceptions.UserNotFoundException;
@@ -21,7 +21,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

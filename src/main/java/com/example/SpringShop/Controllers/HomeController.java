@@ -1,6 +1,6 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Home.HomepageViewDto;
 import com.example.SpringShop.Exceptions.CustomerNotFoundException;
 import com.example.SpringShop.Exceptions.UserNotFoundException;

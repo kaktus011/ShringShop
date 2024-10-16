@@ -1,7 +1,7 @@
 package com.example.SpringShop.Controllers;
 
 import com.example.SpringShop.Dto.Cart.CartViewDto;
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Services.CartService;
 import com.example.SpringShop.Services.CustomerService;

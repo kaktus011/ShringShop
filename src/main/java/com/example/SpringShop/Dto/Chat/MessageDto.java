@@ -1,21 +1,21 @@
-package com.example.SpringShop.Dto;
+package com.example.SpringShop.Dto.Chat;
 
 import java.time.LocalDateTime;
 
 public class MessageDto {
-    private String customerName;
+    private String senderName;
     private String content;
     private LocalDateTime date;
 
-    public MessageDto(String customerName, String content, LocalDateTime date) {
-        this.customerName = customerName;
+    public MessageDto(String senderName, String content, LocalDateTime date) {
+        this.senderName = senderName;
         this.content = content;
         this.date = date;
     }
 
-    public String getCustomerName() {return customerName;}
+    public String getSenderName() {return senderName;}
 
-    public void setCustomerName(String customerName) {this.customerName = customerName;}
+    public void setSenderName(String senderName) {this.senderName = senderName;}
 
     public String getContent() {return content;}
 

@@ -106,6 +106,16 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    public void deactivateProductFromAdmin(Long productId){
+        Product product = getProductById(productId);
+        if(productRepository.ProductWithCustomerExists(productId, product.getCustomer()) == null){
+            throw new ProductWithCustomerNotFoundException();
+        }
+        Customer customer = customerService.getCustomerByUsername(product.getCustomer().getUser().getUsername());
+        product.setActive(false);
+        productRepository.save(product);
+    }
+
     public Product updateProduct(Long productId, String username, ProductCreateDto productCreateDto) {
         Product product = getProductById(productId);
         Customer customer = customerService.getCustomerByUsername(username);
@@ -212,25 +222,23 @@ public class ProductService {
 
     public void deleteFavouriteProduct(Customer customer, Long productId) {
         Product product = getProductById(productId);
-        CustomerFavouriteProduct favourite = customerFavouriteProductRepository.findByCustomerIdAndByProductId(customer.getId(), productId);
+        Optional<CustomerFavouriteProduct> favouriteOpt = customerFavouriteProductRepository
+                .findByCustomerIdAndByProductId(customer.getId(), productId);
 
-        if (favourite == null) {
-            throw new ProductNotInFavouritesException("The product is not in your favourites.");
-        }
+        CustomerFavouriteProduct favourite = favouriteOpt
+                .orElseThrow(() -> new ProductNotInFavouritesException("The product is not in your favourites."));
 
         customer.getFavouriteProducts().remove(favourite);
         product.getCustomersWhoFavourited().remove(favourite);
-        product.getCustomersWhoFavourited().remove(favourite);
 
         customerFavouriteProductRepository.delete(favourite);
+        productRepository.save(product);
         customerRepository.save(customer);
     }
 
     public Product getProductById(Long id) {
-        Product product = productRepository.findById(id).get();
-        if (product == null) {
-            throw new InvalidProductException();
-        }
+        Optional<Product> productOpt = productRepository.findById(id);
+        Product product = productOpt.orElseThrow(() -> new InvalidProductException());
         return product;
     }
 }

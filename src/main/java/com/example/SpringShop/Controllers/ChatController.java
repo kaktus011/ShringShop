@@ -1,10 +1,16 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.ChatDto;
-import com.example.SpringShop.Dto.ChatOverviewDto;
+import com.example.SpringShop.Dto.Chat.ChatDto;
+import com.example.SpringShop.Dto.Chat.ChatOverviewDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
+import com.example.SpringShop.Exceptions.ChatNotFoundException;
+import com.example.SpringShop.Exceptions.CustomerDoesNotHaveChatException;
+import com.example.SpringShop.Exceptions.CustomerNotFoundException;
+import com.example.SpringShop.Exceptions.UserNotFoundException;
 import com.example.SpringShop.Services.ChatService;
 import com.example.SpringShop.Services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,22 +32,55 @@ public class ChatController {
     }
 
     @PostMapping("/message")
-    public ResponseEntity<ChatDto> sendMessage(@RequestParam Long receiverId, @RequestParam String content) {
+    public ResponseEntity<?> sendMessage(@RequestParam Long receiverId, @RequestParam String content) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Long senderId = customerService.getCustomerId(username);
 
-        ChatDto chatDto = chatService.sendMessage(senderId, receiverId, content);
-        return ResponseEntity.ok(chatDto);
+        try{
+            Long senderId = customerService.getCustomerId(username);
+            ChatDto chatDto = chatService.sendMessage(senderId, receiverId, content);
+            return ResponseEntity.ok(chatDto);
+        }catch (UserNotFoundException | CustomerNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with sending message.");
+        }
     }
 
     @GetMapping("/all-chats")
-    public ResponseEntity<List<ChatOverviewDto>> getAllChats() {
+    public ResponseEntity<?> getAllChats() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Long senderId = customerService.getCustomerId(username);
+        try{
+            Long senderId = customerService.getCustomerId(username);
+            List<ChatOverviewDto> chats = chatService.getAllChats(senderId);
+            return ResponseEntity.ok(chats);
+        }catch (UserNotFoundException | CustomerNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with retrieving chats.");
+        }
+    }
 
-        List<ChatOverviewDto> chats = chatService.getAllChats(senderId);
-        return ResponseEntity.ok(chats);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getChatById(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        try{
+            Long senderId = customerService.getCustomerId(username);
+            ChatDto chat = chatService.getChatById(username, id);
+            return ResponseEntity.ok(chat);
+        }catch (UserNotFoundException | CustomerNotFoundException | ChatNotFoundException ex) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }catch(CustomerDoesNotHaveChatException ex){
+            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+        catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with retrieving chats.");
+        }
     }
 }

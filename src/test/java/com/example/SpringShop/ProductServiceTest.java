@@ -8,7 +8,6 @@ import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.*;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.ProductService;
-import com.example.SpringShop.Services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -36,9 +35,6 @@ private RecentlyViewedProductRepository recentlyViewedProductRepository;
 
 @Mock
 private CustomerFavouriteProductRepository customerFavouriteProductRepository;
-
-@Mock
-private UserService userService;
 
 @Mock
 private CustomerService customerService;
@@ -270,7 +266,6 @@ void setUp() {
 
     @Test
     public void testMakeProductFavourite_AddsToFavouriteSuccessfully() {
-        // Act
         var customer = new Customer();
         customer.setId(1L);
         customer.setFavouriteProducts(new ArrayList<>());
@@ -278,12 +273,11 @@ void setUp() {
         var product = new Product();
         product.setId(1L);
         product.setCustomer(new Customer());
-        product.getCustomer().setId(2L);  // Another customer owns the product
+        product.getCustomer().setId(2L);
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         productService.makeProductFavourite(customer, product.getId());
 
-        // Assert
         assertEquals(1, customer.getFavouriteProducts().size());
         assertTrue(customer.getFavouriteProducts().get(0).getProduct().equals(product));
         verify(customerRepository, times(1)).save(customer);
@@ -291,31 +285,25 @@ void setUp() {
 
     @Test
     public void testMakeProductFavourite_ThrowsExceptionWhenFavoritingOwnProduct() {
-        // Arrange
         var customer = new Customer();
         customer.setId(1L);
         customer.setFavouriteProducts(new ArrayList<>());
-
-       var product = new Product();
+        var product = new Product();
         product.setId(1L);
         product.setCustomer(new Customer());
-        product.getCustomer().setId(2L);  // Another customer owns the product
+        product.getCustomer().setId(2L);
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
-        product.setCustomer(customer); // Customer owns the product
-
-        // Act & Assert
+        product.setCustomer(customer);
         assertThrows(CannotAddToFavouritesException.class, () -> {
             productService.makeProductFavourite(customer, product.getId());
         });
 
-        // Ensure no interaction with the repository when exception is thrown
         verify(customerRepository, never()).save(customer);
     }
 
     @Test
     public void testMakeProductFavourite_DoesNotAddDuplicate() {
-        // Arrange
         var customer = new Customer();
         customer.setId(1L);
         customer.setFavouriteProducts(new ArrayList<>());
@@ -323,18 +311,148 @@ void setUp() {
         var product = new Product();
         product.setId(1L);
         product.setCustomer(new Customer());
-        product.getCustomer().setId(2L);  // Another customer owns the product
+        product.getCustomer().setId(2L);
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         CustomerFavouriteProduct favouriteProduct = new CustomerFavouriteProduct();
         favouriteProduct.setProduct(product);
         customer.setFavouriteProducts(Collections.singletonList(favouriteProduct));
 
-        // Act
         productService.makeProductFavourite(customer, product.getId());
+        assertEquals(1, customer.getFavouriteProducts().size());
+        verify(customerRepository, never()).save(customer);
+    }
 
-        // Assert
-        assertEquals(1, customer.getFavouriteProducts().size());  // No duplicates added
-        verify(customerRepository, never()).save(customer); // No save as it's already favorited
+    @Test
+    public void testUpdateProduct_Success() {
+        Long productId = 1L;
+        String username = "testUser";
+        ProductCreateDto productCreateDto = new ProductCreateDto();
+        productCreateDto.setTitle("Updated Product");
+        productCreateDto.setDescription("Updated Description");
+        productCreateDto.setPrice(150.0);
+        productCreateDto.setLocation("New Location");
+        productCreateDto.setCategory("Electronics");
+        productCreateDto.setImage("newImageUrl");
+        productCreateDto.setStatus("Available");
+
+        Product existingProduct = new Product();
+        existingProduct.setId(productId);
+        User user = new User();
+        user.setUsername(username);
+        Customer customer = new Customer();
+        customer.setUser(user);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(customerService.getCustomerByUsername(username)).thenReturn(customer);
+        when(productRepository.ProductWithCustomerExists(productId, customer)).thenReturn(existingProduct);
+        Category category = new Category();
+        category.setName("Electronics");
+        when(categoryRepository.findByName("Electronics")).thenReturn(category);
+        when(productRepository.save(existingProduct)).thenReturn(existingProduct);
+
+        Product updatedProduct = productService.updateProduct(productId, username, productCreateDto);
+
+        assertNotNull(updatedProduct);
+        assertEquals("Updated Product", updatedProduct.getTitle());
+        assertEquals("Updated Description", updatedProduct.getDescription());
+        assertEquals(150.0, updatedProduct.getPrice(), 0);
+        assertEquals("New Location", updatedProduct.getLocation());
+        assertEquals(category, updatedProduct.getCategory());
+        assertEquals("newImageUrl", updatedProduct.getImageUrl());
+        assertEquals("Available", updatedProduct.getStatus());
+
+        verify(productRepository).save(updatedProduct);
+    }
+
+    @Test
+    void testDeleteFavouriteProduct_Success() {
+        var customer = new Customer();
+               customer.setId(1L);
+        var product = new Product();
+               product.setId(1L);
+        var favourite = new CustomerFavouriteProduct();
+        favourite.setCustomer(customer);
+        favourite.setProduct(product);
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        when(customerFavouriteProductRepository.findByCustomerIdAndByProductId(customer.getId(), product.getId()))
+                .thenReturn(Optional.of(favourite));
+
+        assertDoesNotThrow(() -> productService.deleteFavouriteProduct(customer, product.getId()));
+        verify(customerFavouriteProductRepository).delete(favourite);
+        verify(productRepository).save(product);
+        verify(customerRepository).save(customer);
+    }
+    @Test
+    void testDeleteFavouriteProduct_ProductNotInFavourites() {
+
+        var customer = new Customer();
+        customer.setId(1L);
+        var product = new Product();
+        product.setId(1L);
+        var favourite = new CustomerFavouriteProduct();
+        favourite.setCustomer(customer);
+        favourite.setProduct(product);
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        when(customerFavouriteProductRepository.findByCustomerIdAndByProductId(customer.getId(), product.getId()))
+                .thenReturn(Optional.empty());
+
+        ProductNotInFavouritesException exception = assertThrows(ProductNotInFavouritesException.class,
+                () -> productService.deleteFavouriteProduct(customer, product.getId()));
+        assertEquals("The product is not in your favourites.", exception.getMessage());
+
+        verify(customerFavouriteProductRepository, never()).delete(any());
+    }
+    @Test
+    void testDeactivateProductFromAdmin_Success() {
+
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+        product.setActive(true);
+        User user = new User();
+        user.setUsername("admin");
+        Customer customer = new Customer();
+        customer.setUser(user);
+        product.setCustomer(customer);
+
+        when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
+        when(productRepository.ProductWithCustomerExists(productId, customer)).thenReturn(product);
+        when(customerService.getCustomerByUsername(anyString())).thenReturn(customer);
+
+        productService.deactivateProductFromAdmin(productId);
+
+        assertFalse(product.isActive());
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void testDeactivateProductFromAdmin_ProductWithCustomerNotFound() {
+        Long productId = 1L;
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setCustomer(new Customer());
+
+        when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(product));
+        when(productRepository.ProductWithCustomerExists(anyLong(), any(Customer.class))).thenReturn(null);
+
+        assertThrows(ProductWithCustomerNotFoundException.class, () -> {
+            productService.deactivateProductFromAdmin(productId);
+        });
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void testDeactivateProductFromAdmin_ProductNotFound() {
+        Long productId = 1L;
+
+        when(productRepository.findById(productId)).thenReturn(java.util.Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> {
+            productService.deactivateProductFromAdmin(productId);
+        });
+
+        verify(productRepository, never()).save(any(Product.class));
     }
 }

@@ -1,6 +1,6 @@
 package com.example.SpringShop.Controllers;
 
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductViewDto;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Exceptions.CannotAddToFavouritesException;
@@ -29,7 +29,7 @@ public class FavouritesController {
         this.productService = productService;
     }
 
-    @GetMapping("/get-favourite-products")
+    @GetMapping("/get-favourites")
     public ResponseEntity<?> getFavouriteProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -45,7 +45,7 @@ public class FavouritesController {
         }
     }
 
-    @PostMapping("/favourite-product/{id}")
+    @PostMapping("/favourite/{id}")
     public ResponseEntity<?> makeProductFavourite(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -63,7 +63,7 @@ public class FavouritesController {
         }
     }
 
-    @PostMapping("/unfavourite-product/{id}")
+    @PostMapping("/unfavourite/{id}")
     public ResponseEntity<?> deleteFavouriteProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -96,7 +96,7 @@ public class FavouritesController {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieveng last viewed products.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while retrieving last viewed products.");
         }
     }
 }

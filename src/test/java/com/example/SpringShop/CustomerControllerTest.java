@@ -265,7 +265,7 @@ public class CustomerControllerTest {
                 .thenThrow(new UsernameAlreadyTakenException("takenUsername"));
 
         ResponseEntity<?> response = customerController.changeUsername(changeUsernameDto);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("Username 'takenUsername' is already taken.", response.getBody());
     }
 
@@ -379,7 +379,7 @@ public class CustomerControllerTest {
                 .thenThrow(new NewNumberSameLikeOldNumberException());
 
         ResponseEntity<?> response = customerController.changeMobileNumber(changeMobileNumberDto);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("New mobile number should be different from old mobile number.", response.getBody());
     }
 

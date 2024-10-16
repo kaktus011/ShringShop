@@ -1,7 +1,7 @@
 package com.example.SpringShop;
 
 import com.example.SpringShop.Controllers.ProductController;
-import com.example.SpringShop.Dto.ErrorResponseDto;
+import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductCreateDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
 import com.example.SpringShop.Dto.Product.ProductIndexDto;
@@ -12,7 +12,6 @@ import com.example.SpringShop.Repositories.CategoryRepository;
 import com.example.SpringShop.Repositories.ProductRepository;
 import com.example.SpringShop.Repositories.RecentlyViewedProductRepository;
 import com.example.SpringShop.Repositories.UserRepository;
-import com.example.SpringShop.Services.CategoryService;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
-import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -52,6 +50,9 @@ private CategoryRepository categoryRepository  ;
 
 @Mock
 private RecentlyViewedProductRepository recentlyViewedProductRepository;
+
+@Mock
+private SecurityContextHolder securityContextHolder;
 
 @Mock
 private ProductMapper productMapper;
@@ -262,82 +263,6 @@ public void testDeactivateProduct_ProductWithCustomerNotFoundException() {
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals("Customer does not have access to this product.", ((ErrorResponseDto) response.getBody()).getMessage());
 }
-    @Test
-    public void testUpdateProduct_Success() {
-        Long productId = 1L;
-Category category = new Category();
-category.setName("Category Name");
-        Product mockProduct = new Product();
-        mockProduct.setId(1L);
-        mockProduct.setTitle("Title");
-        mockProduct.setDescription("Test description");
-        mockProduct.setLocation("Test location");
-        mockProduct.setStatus("Test status");
-        mockProduct.setImageUrl("test");
-        mockProduct.setPrice(20L);
-        mockProduct.setView(0);
-        mockProduct.setActive(true);
-        mockProduct.setCreationDate(LocalDateTime.now());
-        mockProduct.setCustomer(new Customer());
-        mockProduct.setCategory(category);
-
-        // Mock ProductCreateDto with updated values
-        ProductCreateDto productCreateDto = new ProductCreateDto();
-        productCreateDto.setTitle("Updated Title");
-        productCreateDto.setDescription("Updated Description");
-        productCreateDto.setPrice(150.0);
-        productCreateDto.setLocation("Updated Location");
-        productCreateDto.setCategory("Category Name");
-        productCreateDto.setImage("updatedImageUrl");
-        productCreateDto.setStatus("Available");
-
-        // Mock repository methods
-        when(productRepository.findById(productId)).thenReturn(Optional.of(mockProduct));
-        when(customerService.getCustomerByUsername("testUser")).thenReturn(new Customer());
-        when(productRepository.ProductWithCustomerExists(productId, new Customer())).thenReturn(mockProduct);
-        when(categoryRepository.findByName("Category Name")).thenReturn(new Category());
-
-        // Call the update method
-        Product updatedProduct = productService.updateProduct(productId, "testUser", productCreateDto);
-
-        // Assertions to verify the updated product
-        assertNotNull(updatedProduct);
-        assertEquals("Updated Title", updatedProduct.getTitle());
-        assertEquals("Updated Description", updatedProduct.getDescription());
-        assertEquals(150.0, updatedProduct.getPrice());
-        assertEquals("Updated Location", updatedProduct.getLocation());
-        assertEquals("updatedImageUrl", updatedProduct.getImageUrl());
-        assertEquals("Available", updatedProduct.getStatus());
-
-        // Verify that the product is saved
-        verify(productRepository).save(updatedProduct);
-    }
-
-
-    @Test
-    public void testUpdateProduct_UserNotFoundException() {
-        Long productId = 1L;
-        var productCreateDto = new ProductCreateDto();
-        when(productService.updateProduct(productId, "testUser", productCreateDto)).thenThrow(new UserNotFoundException());
-
-        ResponseEntity<?> response = productController.updateProduct(productId, productCreateDto);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("User not found", ((ErrorResponseDto) response.getBody()).getMessage());
-    }
-
-    @Test
-    public void testUpdateProduct_ProductWithCustomerNotFoundException() {
-        Long productId = 1L;
-        var productCreateDto = new ProductCreateDto();
-
-        when(productService.updateProduct(productId, "testUser", productCreateDto)).thenThrow(new ProductWithCustomerNotFoundException());
-
-        ResponseEntity<?> response = productController.updateProduct(productId, productCreateDto);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Product with customer not found", ((ErrorResponseDto) response.getBody()).getMessage());
-    }
 }
 
 

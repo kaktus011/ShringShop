@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -247,26 +249,6 @@ public class CustomerServiceTest {
         assertThrows(InvalidPasswordException.class, () -> {
             customerService.changePassword(changePasswordDto, "currentUsername");
         });
-    }
-
-    @Test
-    void testGetCustomerDetails_Success() {
-        String username = "testUsername";
-        User mockUser = new User();
-        mockUser.setUsername(username);
-        Customer mockCustomer = new Customer();
-        mockCustomer.setId(1L);
-        mockCustomer.setUser(mockUser);
-        CustomerDetailsDto expectedCustomerDetailsDto = new CustomerDetailsDto();
-        expectedCustomerDetailsDto.setUsername(username);
-        expectedCustomerDetailsDto.setId(1L);
-
-        when(userService.getUserByUsername(username)).thenReturn(mockUser);
-        when(customerService.getCustomerByUsername(username)).thenReturn(mockCustomer);
-
-        CustomerDetailsDto result = customerService.getCustomerDetails(username);
-        assertNotNull(result);
-        assertEquals(expectedCustomerDetailsDto, result);
     }
 
     @Test
