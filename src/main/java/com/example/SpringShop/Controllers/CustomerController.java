@@ -36,9 +36,11 @@ public class CustomerController {
             Customer newCustomer = customerService.register(registerDto);
             return ResponseEntity.ok(newCustomer);
         } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException | MobileNumberAlreadyExistsException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ex.getMessage());
         } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().body("An unexpected error occurred with registering.");
+            return ResponseEntity.badRequest()
+                    .body("An unexpected error occurred with registering.");
         }
     }
 
@@ -50,14 +52,16 @@ public class CustomerController {
         } catch (InvalidCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with logging in.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred with logging in.");
         }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") || authorizationHeader.length() <= 7) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("You are not logged in.");
         }
 
         String token = authorizationHeader.substring(7);
@@ -71,6 +75,7 @@ public class CustomerController {
     public ResponseEntity<?> changeUsername(@Valid @RequestBody ChangeUsernameDto changeUsernameDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
+
         try {
             Customer updatedCustomer = customerService.changeUsername(changeUsernameDto, currentUsername);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
@@ -82,7 +87,8 @@ public class CustomerController {
         } catch (UsernameAlreadyTakenException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing username.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred with changing username.");
         }
     }
 
@@ -90,6 +96,7 @@ public class CustomerController {
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+
         try {
             Customer updatedCustomer = customerService.changePassword(changePasswordDto, username);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
@@ -97,7 +104,8 @@ public class CustomerController {
         } catch (InvalidPasswordException | PasswordMismatchException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing password.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred with changing password.");
         }
     }
 
@@ -105,6 +113,7 @@ public class CustomerController {
     public ResponseEntity<?> getCustomerDetails() {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          String currentName = authentication.getName();
+
          try{
              CustomerDetailsDto customerDetailsDto = customerService.getCustomerDetails(currentName);
              return ResponseEntity.ok(customerDetailsDto);
@@ -112,7 +121,8 @@ public class CustomerController {
              ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
          }catch (Exception ex) {
-             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with getting details.");
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body("An unexpected error occurred with getting details.");
          }
     }
 
@@ -120,6 +130,7 @@ public class CustomerController {
     public ResponseEntity<?> changeMobileNumber(@Valid @RequestBody ChangeMobileNumberDto changeMobileNumberDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+
         try {
             Customer updatedCustomer = customerService.changeMobileNumber(changeMobileNumberDto, username);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
@@ -129,7 +140,8 @@ public class CustomerController {
         } catch (NewNumberSameLikeOldNumberException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());}
         catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing mobile number.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred with changing mobile number.");
         }
     }
 
@@ -137,6 +149,7 @@ public class CustomerController {
     public ResponseEntity<?> changeEmail(@Valid @RequestBody ChangeEmailDto changeEmailDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentName = authentication.getName();
+
         try {
             Customer updatedCustomer = customerService.changeEmail(changeEmailDto, currentName);
             var updatedCustomerDto = CustomerMapper.toCustomerDetailsDto(updatedCustomer);
@@ -146,7 +159,8 @@ public class CustomerController {
         } catch (NewEmailSameLikeOldEmailException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred with changing email.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred with changing email.");
         }
     }
 }
