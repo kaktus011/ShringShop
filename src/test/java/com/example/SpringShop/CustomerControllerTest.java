@@ -66,6 +66,7 @@ public class CustomerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(newCustomer, response.getBody());
     }
+
     @Test
     void testRegisterUsernameAlreadyExists() throws Exception {
         RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
@@ -229,7 +230,7 @@ public class CustomerControllerTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
 
         when(customerService.changeUsername(changeUsernameDto, "currentUsername"))
-                .thenThrow(new UserNotFoundException());
+                .thenThrow(new UserNotFoundException("currentUsername"));
 
         ResponseEntity<?> response = customerController.changeUsername(changeUsernameDto);
 

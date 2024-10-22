@@ -25,7 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -231,7 +230,7 @@ public class CartControllerTest {
         when(authentication.getName()).thenReturn("testUser");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(customerService.getCustomerId("testUser")).thenReturn(customerId);
-        when(cartService.deleteProductFromCart(eq(customerId), eq(productId))).thenThrow(new UserNotFoundException());
+        when(cartService.deleteProductFromCart(eq(customerId), eq(productId))).thenThrow(new UserNotFoundException("testUser"));
 
         ResponseEntity<?> response = cartController.deleteProductFromCart(productId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
