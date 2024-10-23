@@ -12,6 +12,7 @@ import com.example.SpringShop.Services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class ChatController {
         this.customerService = customerService;
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@RequestParam Long receiverId, @RequestParam String content) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -48,6 +50,7 @@ public class ChatController {
         }
     }
 
+    @Secured("ADMIN")
     @GetMapping("/all-chats")
     public ResponseEntity<?> getAllChats() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,12 +67,12 @@ public class ChatController {
         }
     }
 
+    @Secured("ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<?> getChatById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         try{
-            Long senderId = customerService.getCustomerId(username);
             ChatDto chat = chatService.getChatById(username, id);
             return ResponseEntity.ok(chat);
         }catch (UserNotFoundException | CustomerNotFoundException | ChatNotFoundException ex) {

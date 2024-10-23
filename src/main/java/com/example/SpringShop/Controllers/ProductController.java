@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ public class ProductController {
         this.productService = productService;
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateDto productCreateDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,6 +49,7 @@ public class ProductController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @GetMapping("/{id}")
     public ResponseEntity<?> productDetails(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -64,6 +67,7 @@ public class ProductController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PutMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivateProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -81,6 +85,7 @@ public class ProductController {
         }
     }
 
+    @Secured("ADMIN")
     @PutMapping("/deactivateFromAdmin/{id}")
     public ResponseEntity<?> deactivateProductFromAdmin(@PathVariable Long id) {
         try{
@@ -95,6 +100,7 @@ public class ProductController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PostMapping("/update/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductCreateDto productCreateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -113,6 +119,7 @@ public class ProductController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @GetMapping("/all")
     public ResponseEntity<Page<ProductViewDto>> getFilteredProducts(
             @RequestParam(required = false) String categoryName,

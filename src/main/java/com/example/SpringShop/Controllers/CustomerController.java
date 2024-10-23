@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +58,7 @@ public class CustomerController {
         }
     }
 
+    @Secured("CUSTOMER")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") || authorizationHeader.length() <= 7) {
@@ -71,6 +73,7 @@ public class CustomerController {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PutMapping("/change-username")
     public ResponseEntity<?> changeUsername(@Valid @RequestBody ChangeUsernameDto changeUsernameDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,6 +95,7 @@ public class CustomerController {
         }
     }
 
+    @Secured("CUSTOMER")
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -109,6 +113,7 @@ public class CustomerController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @GetMapping("/details")
     public ResponseEntity<?> getCustomerDetails() {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -126,6 +131,7 @@ public class CustomerController {
          }
     }
 
+    @Secured("CUSTOMER")
     @PutMapping("/change-mobile-number")
     public ResponseEntity<?> changeMobileNumber(@Valid @RequestBody ChangeMobileNumberDto changeMobileNumberDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -145,6 +151,7 @@ public class CustomerController {
         }
     }
 
+    @Secured("CUSTOMER")
     @PutMapping("/change-email")
     public ResponseEntity<?> changeEmail(@Valid @RequestBody ChangeEmailDto changeEmailDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

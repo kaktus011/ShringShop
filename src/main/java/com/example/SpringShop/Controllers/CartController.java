@@ -8,6 +8,7 @@ import com.example.SpringShop.Services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class CartController {
         this.customerService = customerService;
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @GetMapping("/get-cart")
     public ResponseEntity<?> getCartForCustomer() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -39,11 +41,11 @@ public class CartController {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception ex) {
-            ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred with retrieving your cart.");
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @PostMapping("/add-product/{id}")
     public ResponseEntity<?> addProductToCart(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -60,6 +62,7 @@ public class CartController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<?> deleteProductFromCart(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -77,6 +80,7 @@ public class CartController {
         }
     }
 
+    @Secured({"CUSTOMER", "ADMIN"})
     @DeleteMapping("/clear-cart")
     public ResponseEntity<?> clearCart(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
