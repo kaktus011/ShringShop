@@ -233,7 +233,7 @@ public class CustomerServiceTest {
     @Test
     void testGetCustomerDetails_UserNotFound() {
         String username = "nonExistingUsername";
-        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException(username));
+        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException());
 
         assertThrows(UserNotFoundException.class, () -> customerService.getCustomerDetails(username));
     }

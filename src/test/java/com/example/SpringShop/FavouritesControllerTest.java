@@ -165,7 +165,7 @@ public class FavouritesControllerTest {
         String username = "testUser";
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(customerService.getCustomerByUsername(username)).thenThrow(new UserNotFoundException(username));
+        when(customerService.getCustomerByUsername(username)).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = favouritesController.getFavouriteProducts();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

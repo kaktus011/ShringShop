@@ -41,7 +41,7 @@ public class CustomerController {
                     .body(ex.getMessage());
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest()
-                    .body("An unexpected error occurred with registering.");
+                    .body("An unexpected error occurred with registering. " + ex.getMessage());
         }
     }
 
@@ -52,9 +52,10 @@ public class CustomerController {
             return ResponseEntity.ok(token);
         } catch (InvalidCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with logging in.");
+                    .body("An unexpected error occurred with logging in. " + e.getMessage());
         }
     }
 
@@ -91,7 +92,7 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing username.");
+                    .body("An unexpected error occurred with changing username. " + ex.getMessage());
         }
     }
 
@@ -109,7 +110,7 @@ public class CustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing password.");
+                    .body("An unexpected error occurred with changing password. " + ex.getMessage());
         }
     }
 
@@ -127,7 +128,7 @@ public class CustomerController {
              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
          }catch (Exception ex) {
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                     .body("An unexpected error occurred with getting details.");
+                     .body("An unexpected error occurred with getting details. " + ex.getMessage());
          }
     }
 
@@ -147,7 +148,7 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());}
         catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing mobile number.");
+                    .body("An unexpected error occurred with changing mobile number. " + ex.getMessage());
         }
     }
 
@@ -167,7 +168,7 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing email.");
+                    .body("An unexpected error occurred with changing email. " + ex.getMessage());
         }
     }
 }

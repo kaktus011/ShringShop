@@ -107,7 +107,7 @@ void testCreateProduct_UserNotFound() {
 
     String username = "testUser";
     when(authentication.getName()).thenReturn(username);
-    when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException(username));
+    when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException());
 
     ResponseEntity<?> response = productController.createProduct(productCreateDto);
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -164,7 +164,7 @@ void testCreateProduct_CategoryNotFound() {
         String username = "testUser";
 
         when(authentication.getName()).thenReturn(username);
-        doThrow(new UserNotFoundException(username)).when(productService).productDetails(productId, username);
+        doThrow(new UserNotFoundException()).when(productService).productDetails(productId, username);
 
         ResponseEntity<?> response = productController.productDetails(productId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -217,7 +217,7 @@ public void testDeactivateProduct_UserNotFoundException() {
     String username = "testUser";
 
     when(authentication.getName()).thenReturn(username);
-    doThrow(new UserNotFoundException(username)).when(productService).deactivateProduct(productId, username);
+    doThrow(new UserNotFoundException()).when(productService).deactivateProduct(productId, username);
 
     ResponseEntity<?> response = productController.deactivateProduct(productId);
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

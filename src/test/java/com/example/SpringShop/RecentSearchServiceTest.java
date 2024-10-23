@@ -63,7 +63,7 @@ public class RecentSearchServiceTest {
     public void testGetRecentSearches_UserNotFound() {
         String username = "nonExistentUser";
 
-        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException(username));
+        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException());
 
         assertThrows(UserNotFoundException.class, () -> recentSearchService.getRecentSearches(username));
     }

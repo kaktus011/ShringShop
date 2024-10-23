@@ -85,7 +85,7 @@ public class ChatControllerTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException(username));
+        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = chatController.sendMessage(receiverId, content);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -133,7 +133,7 @@ public class ChatControllerTest {
 
     @Test
     public void testGetAllChats_UserNotFound_ReturnsNotFound() {
-        when(customerService.getCustomerId("testUser")).thenThrow(new UserNotFoundException("testUser"));
+        when(customerService.getCustomerId("testUser")).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = chatController.getAllChats();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

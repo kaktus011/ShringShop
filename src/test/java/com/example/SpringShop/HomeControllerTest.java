@@ -82,7 +82,7 @@ public class HomeControllerTest {
 
     @Test
     public void testLoadHome_UserNotFound() {
-        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException(username));
+        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = homeController.loadHome();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

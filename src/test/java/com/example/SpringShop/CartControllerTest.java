@@ -230,7 +230,7 @@ public class CartControllerTest {
         when(authentication.getName()).thenReturn("testUser");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         when(customerService.getCustomerId("testUser")).thenReturn(customerId);
-        when(cartService.deleteProductFromCart(eq(customerId), eq(productId))).thenThrow(new UserNotFoundException("testUser"));
+        when(cartService.deleteProductFromCart(eq(customerId), eq(productId))).thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = cartController.deleteProductFromCart(productId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

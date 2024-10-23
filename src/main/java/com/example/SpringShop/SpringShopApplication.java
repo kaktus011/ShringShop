@@ -31,7 +31,7 @@ public class SpringShopApplication {
             if (userRepository.findByUsername("admin") == null) {
                 User admin = new User();
                 admin.setUsername("admin");
-                admin.setPassword(encodePassword().encode("admin123"));
+                admin.setPassword(passwordEncoder().encode("admin123"));
                 admin.setRole(UserRoleConstants.ADMIN);
                 admin.setEmail("admin@admin.com");
                 userRepository.save(admin);
@@ -40,7 +40,7 @@ public class SpringShopApplication {
     }
 
     @Bean
-    public PasswordEncoder encodePassword() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

@@ -5,7 +5,6 @@ import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Exceptions.*;
-import com.example.SpringShop.Repositories.CustomerRepository;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.UserService;
 import com.example.SpringShop.Utilities.JWTUtil;
@@ -230,7 +229,7 @@ public class CustomerControllerTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
 
         when(customerService.changeUsername(changeUsernameDto, "currentUsername"))
-                .thenThrow(new UserNotFoundException("currentUsername"));
+                .thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = customerController.changeUsername(changeUsernameDto);
 
