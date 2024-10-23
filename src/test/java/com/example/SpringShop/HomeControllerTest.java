@@ -45,8 +45,7 @@ public class HomeControllerTest {
     @Mock
     private Authentication authentication;
 
-    private String username = "testUser";
-    private Long customerId = 1L;
+    private final String username = "testUser";
 
     @BeforeEach
     public void setup() {
@@ -57,6 +56,7 @@ public class HomeControllerTest {
 
     @Test
     public void testLoadHome_Success() {
+        Long customerId = 1L;
         when(customerService.getCustomerId(username)).thenReturn(customerId);
         when(productService.getLast10ViewedProducts(customerId)).thenReturn(Collections.emptyList());
         when(recentSearchService.getRecentSearches(username)).thenReturn(Collections.emptyList());
@@ -66,7 +66,7 @@ public class HomeControllerTest {
         ResponseEntity<?> response = homeController.loadHome();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody() instanceof HomepageViewDto);
+        assertInstanceOf(HomepageViewDto.class, response.getBody());
     }
 
     @Test
@@ -76,18 +76,18 @@ public class HomeControllerTest {
         ResponseEntity<?> response = homeController.loadHome();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody() instanceof ErrorResponseDto);
+        assertInstanceOf(ErrorResponseDto.class, response.getBody());
         assertEquals("Customer not found.", ((ErrorResponseDto) response.getBody()).getMessage());
     }
 
     @Test
     public void testLoadHome_UserNotFound() {
-        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException());
+        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException(username));
 
         ResponseEntity<?> response = homeController.loadHome();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody() instanceof ErrorResponseDto);
+        assertInstanceOf(ErrorResponseDto.class, response.getBody());
         assertEquals("User not found.", ((ErrorResponseDto) response.getBody()).getMessage());
     }
 }

@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -86,7 +85,7 @@ public class ChatControllerTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getName()).thenReturn(username);
-        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException());
+        when(customerService.getCustomerId(username)).thenThrow(new UserNotFoundException(username));
 
         ResponseEntity<?> response = chatController.sendMessage(receiverId, content);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -134,7 +133,7 @@ public class ChatControllerTest {
 
     @Test
     public void testGetAllChats_UserNotFound_ReturnsNotFound() {
-        when(customerService.getCustomerId("testUser")).thenThrow(new UserNotFoundException());
+        when(customerService.getCustomerId("testUser")).thenThrow(new UserNotFoundException("testUser"));
 
         ResponseEntity<?> response = chatController.getAllChats();
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -166,7 +165,7 @@ public class ChatControllerTest {
         when(chatService.getChatById(username, chatId)).thenThrow(new ChatNotFoundException());
         ResponseEntity<?> response = chatController.getChatById(chatId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertTrue(response.getBody() instanceof ErrorResponseDto);
+        assertInstanceOf(ErrorResponseDto.class, response.getBody());
     }
 
     @Test
@@ -180,6 +179,6 @@ public class ChatControllerTest {
 
         ResponseEntity<?> response = chatController.getChatById(chatId);
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertTrue(response.getBody() instanceof ErrorResponseDto);
+        assertInstanceOf(ErrorResponseDto.class, response.getBody());
     }
 }

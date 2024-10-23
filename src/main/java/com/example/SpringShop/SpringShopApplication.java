@@ -31,15 +31,16 @@ public class SpringShopApplication {
             if (userRepository.findByUsername("admin") == null) {
                 User admin = new User();
                 admin.setUsername("admin");
-                admin.setPassword(passwordEncoder().encode("admin123"));
+                admin.setPassword(encodePassword().encode("admin123"));
                 admin.setRole(UserRoleConstants.ADMIN);
+                admin.setEmail("admin@admin.com");
                 userRepository.save(admin);
             }
         };
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder encodePassword() {
         return new BCryptPasswordEncoder();
     }
 }

@@ -4,7 +4,6 @@ package com.example.SpringShop;
 import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
-import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
 import com.example.SpringShop.Repositories.*;
 import com.example.SpringShop.Services.*;
@@ -19,8 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -31,9 +28,6 @@ public class CustomerServiceTest {
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private CartRepository cartRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -49,9 +43,6 @@ public class CustomerServiceTest {
 
     @Mock
     private JWTUtil jwtUtil;
-
-    @Mock
-    private CustomerMapper customerMapper;
 
     @InjectMocks
     private CustomerService customerService;
@@ -86,9 +77,7 @@ public class CustomerServiceTest {
 
         when(userRepository.existsByUsername("existingUser")).thenReturn(true);
 
-        assertThrows(UsernameAlreadyExistsException.class, () -> {
-            customerService.register(registerDto);
-        });
+        assertThrows(UsernameAlreadyExistsException.class, () -> customerService.register(registerDto));
     }
 
     @Test
@@ -98,9 +87,7 @@ public class CustomerServiceTest {
 
         when(userRepository.existsByEmail("existingEmail@test.com")).thenReturn(true);
 
-        assertThrows(EmailAlreadyExistsException.class, () -> {
-            customerService.register(registerDto);
-        });
+        assertThrows(EmailAlreadyExistsException.class, () -> customerService.register(registerDto));
     }
 
     @Test
@@ -110,9 +97,7 @@ public class CustomerServiceTest {
 
         when(customerRepository.existsByMobileNumber("existingMobile")).thenReturn(true);
 
-        assertThrows(MobileNumberAlreadyExistsException.class, () -> {
-            customerService.register(registerDto);
-        });
+        assertThrows(MobileNumberAlreadyExistsException.class, () -> customerService.register(registerDto));
     }
 
     @Test
@@ -188,9 +173,7 @@ public class CustomerServiceTest {
         User mockUser = new User();
         when(userService.getUserByUsername("currentUsername")).thenReturn(mockUser);
 
-        assertThrows(WrongUsernameException.class, () -> {
-            customerService.changeUsername(changeUsernameDto, "currentUsername");
-        });
+        assertThrows(WrongUsernameException.class, () -> customerService.changeUsername(changeUsernameDto, "currentUsername"));
     }
 
     @Test
@@ -204,9 +187,7 @@ public class CustomerServiceTest {
         User existingUser = new User();
         existingUser.setUsername("takenUsername");
         when(userRepository.findByUsername("takenUsername")).thenReturn(existingUser);
-        assertThrows(UsernameAlreadyTakenException.class, () -> {
-            customerService.changeUsername(changeUsernameDto, "currentUsername");
-        });
+        assertThrows(UsernameAlreadyTakenException.class, () -> customerService.changeUsername(changeUsernameDto, "currentUsername"));
     }
 
     @Test
@@ -246,19 +227,15 @@ public class CustomerServiceTest {
 
         when(userService.getUserByUsername("currentUsername")).thenReturn(mockUser);
 
-        assertThrows(InvalidPasswordException.class, () -> {
-            customerService.changePassword(changePasswordDto, "currentUsername");
-        });
+        assertThrows(InvalidPasswordException.class, () -> customerService.changePassword(changePasswordDto, "currentUsername"));
     }
 
     @Test
     void testGetCustomerDetails_UserNotFound() {
         String username = "nonExistingUsername";
-        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException());
+        when(userService.getUserByUsername(username)).thenThrow(new UserNotFoundException(username));
 
-        assertThrows(UserNotFoundException.class, () -> {
-            customerService.getCustomerDetails(username);
-        });
+        assertThrows(UserNotFoundException.class, () -> customerService.getCustomerDetails(username));
     }
 
     @Test
@@ -298,9 +275,7 @@ public class CustomerServiceTest {
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
         when(customerRepository.findByUser(mockUser)).thenReturn(mockCustomer);
 
-        assertThrows(InvalidMobileNumberException.class, () -> {
-            customerService.changeMobileNumber(changeMobileNumberDto, username);
-        });
+        assertThrows(InvalidMobileNumberException.class, () -> customerService.changeMobileNumber(changeMobileNumberDto, username));
     }
 
     @Test
@@ -318,9 +293,7 @@ public class CustomerServiceTest {
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
         when(customerRepository.findByUser(mockUser)).thenReturn(mockCustomer);
 
-        assertThrows(NewNumberSameLikeOldNumberException.class, () -> {
-            customerService.changeMobileNumber(changeMobileNumberDto, username);
-        });
+        assertThrows(NewNumberSameLikeOldNumberException.class, () -> customerService.changeMobileNumber(changeMobileNumberDto, username));
     }
 
     @Test
@@ -342,9 +315,7 @@ public class CustomerServiceTest {
         when(customerRepository.findByUser(mockUser)).thenReturn(mockCustomer);
         when(customerRepository.findByMobileNumber("takenMobileNumber")).thenReturn(existingCustomer);
 
-        assertThrows(MobileNumberAlreadyTakenException.class, () -> {
-            customerService.changeMobileNumber(changeMobileNumberDto, username);
-        });
+        assertThrows(MobileNumberAlreadyTakenException.class, () -> customerService.changeMobileNumber(changeMobileNumberDto, username));
     }
     @Test
     void testChangeEmail_Success() {
@@ -380,9 +351,7 @@ public class CustomerServiceTest {
 
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
 
-        assertThrows(InvalidEmailException.class, () -> {
-            customerService.changeEmail(changeEmailDto, username);
-        });
+        assertThrows(InvalidEmailException.class, () -> customerService.changeEmail(changeEmailDto, username));
     }
 
     @Test
@@ -396,9 +365,7 @@ public class CustomerServiceTest {
 
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
 
-        assertThrows(NewEmailSameLikeOldEmailException.class, () -> {
-            customerService.changeEmail(changeEmailDto, username);
-        });
+        assertThrows(NewEmailSameLikeOldEmailException.class, () -> customerService.changeEmail(changeEmailDto, username));
     }
 
     @Test
@@ -416,8 +383,6 @@ public class CustomerServiceTest {
         when(userService.getUserByUsername(username)).thenReturn(mockUser);
         when(userRepository.findByEmail("takenEmail@example.com")).thenReturn(existingUser);
 
-        assertThrows(EmailAlreadyTakenException.class, () -> {
-            customerService.changeEmail(changeEmailDto, username);
-        });
+        assertThrows(EmailAlreadyTakenException.class, () -> customerService.changeEmail(changeEmailDto, username));
     }
 }
