@@ -38,7 +38,7 @@ public class HomeController {
     }
 
     //TODO
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping
     public ResponseEntity<?> loadHome() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

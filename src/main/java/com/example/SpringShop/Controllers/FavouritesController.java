@@ -30,7 +30,7 @@ public class FavouritesController {
         this.productService = productService;
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping("/get-favourites")
     public ResponseEntity<?> getFavouriteProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,7 +47,7 @@ public class FavouritesController {
         }
     }
 
-    @Secured("CUSTOMER")
+    @Secured("ROLE_CUSTOMER")
     @PostMapping("/favourite/{id}")
     public ResponseEntity<?> makeProductFavourite(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,7 +66,7 @@ public class FavouritesController {
         }
     }
 
-    @Secured("CUSTOMER")
+    @Secured("ROLE_CUSTOMER")
     @PostMapping("/unfavourite/{id}")
     public ResponseEntity<?> deleteFavouriteProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -86,7 +86,7 @@ public class FavouritesController {
 
     //TODO: Implement the getFavouriteSearches, makeSearchFavourite, deleteFavouriteSearch endpoints
 
-    @Secured("CUSTOMER")
+    @Secured("ROLE_CUSTOMER")
     @GetMapping("/get-recent-products")
     public ResponseEntity<?> getRecentProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

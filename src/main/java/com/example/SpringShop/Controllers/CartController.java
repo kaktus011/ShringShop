@@ -25,7 +25,7 @@ public class CartController {
         this.customerService = customerService;
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping("/get-cart")
     public ResponseEntity<?> getCartForCustomer() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -45,7 +45,7 @@ public class CartController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @PostMapping("/add-product/{id}")
     public ResponseEntity<?> addProductToCart(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,7 +62,7 @@ public class CartController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<?> deleteProductFromCart(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,7 +80,7 @@ public class CartController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @DeleteMapping("/clear-cart")
     public ResponseEntity<?> clearCart(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

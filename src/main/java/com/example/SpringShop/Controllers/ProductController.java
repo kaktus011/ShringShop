@@ -30,7 +30,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @PostMapping("/create")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateDto productCreateDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -49,7 +49,7 @@ public class ProductController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping("/{id}")
     public ResponseEntity<?> productDetails(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,7 +67,7 @@ public class ProductController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @PutMapping("/deactivate/{id}")
     public ResponseEntity<?> deactivateProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -85,7 +85,7 @@ public class ProductController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/deactivateFromAdmin/{id}")
     public ResponseEntity<?> deactivateProductFromAdmin(@PathVariable Long id) {
         try{
@@ -100,7 +100,7 @@ public class ProductController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @PostMapping("/update/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductCreateDto productCreateDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -119,7 +119,7 @@ public class ProductController {
         }
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping("/all")
     public ResponseEntity<Page<ProductViewDto>> getFilteredProducts(
             @RequestParam(required = false) String categoryName,

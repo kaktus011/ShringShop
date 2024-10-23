@@ -26,21 +26,21 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @GetMapping()
     public ResponseEntity<?> getAllCategories() {
         var categories = categoryService.getAllCategories();
         return ResponseEntity.ok(CategoryMapper.toCategoryOverviewDtoList(categories));
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PostMapping("/create")
     public ResponseEntity<CategoryOverviewDto> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
         Category category = categoryService.createCategory(createCategoryDto);
         return ResponseEntity.ok(CategoryMapper.toCategoryOverviewDto(category));
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CreateCategoryDto createCategoryDto) {
         try {
@@ -61,7 +61,7 @@ public class CategoryController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

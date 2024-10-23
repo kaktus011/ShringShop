@@ -32,7 +32,7 @@ public class ChatController {
         this.customerService = customerService;
     }
 
-    @Secured({"CUSTOMER", "ADMIN"})
+    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
     @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@RequestParam Long receiverId, @RequestParam String content) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,7 +50,7 @@ public class ChatController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @GetMapping("/all-chats")
     public ResponseEntity<?> getAllChats() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,7 +67,7 @@ public class ChatController {
         }
     }
 
-    @Secured("ADMIN")
+    @Secured("ROLE_ADMIN")
     @GetMapping("/{id}")
     public ResponseEntity<?> getChatById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
