@@ -31,34 +31,6 @@ public class CustomerController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto) {
-        try {
-            Customer newCustomer = customerService.register(registerDto);
-            return ResponseEntity.ok(newCustomer);
-        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException | MobileNumberAlreadyExistsException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ex.getMessage());
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest()
-                    .body("An unexpected error occurred with registering. " + ex.getMessage());
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto) {
-        try {
-            String token = customerService.login(loginDto);
-            return ResponseEntity.ok(token);
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with logging in. " + e.getMessage());
-        }
-    }
-
     @Secured("ROLE_CUSTOMER")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
@@ -74,7 +46,7 @@ public class CustomerController {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
-    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
+    @Secured("ROLE_CUSTOMER")
     @PutMapping("/change-username")
     public ResponseEntity<?> changeUsername(@Valid @RequestBody ChangeUsernameDto changeUsernameDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -114,7 +86,7 @@ public class CustomerController {
         }
     }
 
-    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
+    @Secured("ROLE_CUSTOMER")
     @GetMapping("/details")
     public ResponseEntity<?> getCustomerDetails() {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

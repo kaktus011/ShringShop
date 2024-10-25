@@ -67,7 +67,7 @@ public class FavouritesController {
     }
 
     @Secured("ROLE_CUSTOMER")
-    @PostMapping("/unfavourite/{id}")
+    @PostMapping("/un-favourite/{id}")
     public ResponseEntity<?> deleteFavouriteProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

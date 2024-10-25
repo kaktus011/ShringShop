@@ -5,7 +5,6 @@ import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Dto.Customer.CustomerDetailsDto;
 import com.example.SpringShop.Entities.Cart;
 import com.example.SpringShop.Entities.Customer;
-import com.example.SpringShop.Entities.RecentSearch;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.EntityMappers.CustomerMapper;
 import com.example.SpringShop.Exceptions.*;
@@ -22,9 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -56,16 +52,15 @@ public class CustomerService {
 
     public Customer register(RegisterDto registerDto){
         if (userRepository.existsByUsername(registerDto.getUsername())) {
-            throw new UsernameAlreadyExistsException(registerDto.getUsername());
+            throw new UsernameAlreadyExistsException();
         }
-
         if (userRepository.existsByEmail(registerDto.getEmail())) {
             throw new EmailAlreadyExistsException(registerDto.getEmail());
         }
-
         if (customerRepository.existsByMobileNumber(registerDto.getMobileNumber())) {
             throw new MobileNumberAlreadyExistsException(registerDto.getMobileNumber());
         }
+
         User user = new User();
         user.setUsername(registerDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));

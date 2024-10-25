@@ -55,8 +55,7 @@ public class HomeController {
         } catch (CustomerNotFoundException | UserNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + errorResponse);
         }
