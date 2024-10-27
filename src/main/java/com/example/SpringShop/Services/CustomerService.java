@@ -72,6 +72,7 @@ public class CustomerService {
         user.setUsername(registerDto.getUsername());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         user.setEmail(registerDto.getEmail());
+
         Role customerRole = roleRepository.findByName(UserRoleConstants.CUSTOMER);
         user.setRoles(Set.of(customerRole));
         userRepository.save(user);

@@ -49,7 +49,8 @@ public class SpringShopApplication {
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder().encode("admin123"));
                 Role adminRole = roleRepository.findByName(UserRoleConstants.ADMIN);
-                admin.setRoles(Set.of(adminRole));
+                Role customerRole = roleRepository.findByName(UserRoleConstants.CUSTOMER);
+                admin.setRoles(Set.of(adminRole, customerRole));
                 admin.setEmail("admin@admin.com");
                 userRepository.save(admin);
             }
