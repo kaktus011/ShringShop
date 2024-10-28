@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,21 +26,21 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     @GetMapping()
     public ResponseEntity<?> getAllCategories() {
         var categories = categoryService.getAllCategories();
         return ResponseEntity.ok(CategoryMapper.toCategoryOverviewDtoList(categories));
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<CategoryOverviewDto> createCategory(@Valid @RequestBody CreateCategoryDto createCategoryDto) {
         Category category = categoryService.createCategory(createCategoryDto);
         return ResponseEntity.ok(CategoryMapper.toCategoryOverviewDto(category));
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CreateCategoryDto createCategoryDto) {
         try {
@@ -61,7 +61,7 @@ public class CategoryController {
         }
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

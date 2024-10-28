@@ -42,12 +42,13 @@ public class SecurityConfig {
                     return corsConfig;
                 }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/customer/**").hasAnyAuthority( "ROLE_CUSTOMER", "ROLE_ADMIN")
+                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        System.out.println("Security configuration set up with role: CUSTOMER"); // Add this line for debugging
 
         return http.build();
     }

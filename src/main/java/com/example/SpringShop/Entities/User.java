@@ -2,6 +2,7 @@ package com.example.SpringShop.Entities;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -33,10 +34,14 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @Override
-    public  Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> (GrantedAuthority) role::getName)
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> authorities = roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
+
+        System.out.println("User roles: " + authorities); // Add this line for debugging
+
+        return authorities;
     }
 
     @Override

@@ -12,7 +12,7 @@ import com.example.SpringShop.Services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ public class ChatController {
         this.customerService = customerService;
     }
 
-    @Secured({"ROLE_CUSTOMER", "ROLE_ADMIN"})
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@RequestParam Long receiverId, @RequestParam String content) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,7 +50,7 @@ public class ChatController {
         }
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all-chats")
     public ResponseEntity<?> getAllChats() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -67,7 +67,7 @@ public class ChatController {
         }
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getChatById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

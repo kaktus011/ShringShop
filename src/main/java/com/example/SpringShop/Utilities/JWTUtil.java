@@ -34,11 +34,13 @@ public class JWTUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject, User user) {
+        var roles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
         return Jwts.builder()
                 .setClaims(claims)
-                .claim("roles", user.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList()))
+                .claim("roles", roles)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -56,11 +58,15 @@ public class JWTUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        System.out.println("Roles in parsed JWT Token: " + claims.get("roles")); // Add this line for debugging
+
+        return claims;
     }
 
     private boolean isTokenExpired(String token) {
