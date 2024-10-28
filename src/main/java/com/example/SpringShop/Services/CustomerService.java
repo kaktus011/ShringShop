@@ -61,9 +61,11 @@ public class CustomerService {
         if (userRepository.existsByUsername(registerDto.getUsername())) {
             throw new UsernameAlreadyExistsException();
         }
+
         if (userRepository.existsByEmail(registerDto.getEmail())) {
             throw new EmailAlreadyExistsException(registerDto.getEmail());
         }
+
         if (customerRepository.existsByMobileNumber(registerDto.getMobileNumber())) {
             throw new MobileNumberAlreadyExistsException(registerDto.getMobileNumber());
         }
@@ -112,6 +114,7 @@ public class CustomerService {
         if (existingUser != null) {
             throw new UsernameAlreadyTakenException(changeUsernameDto.getNewUsername());
         }
+
         user.setUsername(changeUsernameDto.getNewUsername());
         userRepository.save(user);
         return customerRepository.findByUser(user);
@@ -123,9 +126,11 @@ public class CustomerService {
         if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
             throw new InvalidPasswordException();
         }
+
         if (passwordEncoder.matches(changePasswordDto.getNewPassword(), user.getPassword())) {
             throw new PasswordMismatchException();
         }
+
         user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
         userRepository.save(user);
         return customerRepository.findByUser(user);
@@ -143,13 +148,16 @@ public class CustomerService {
         if (!changeMobileNumberDto.getOldMobileNumber().equals(customer.getMobileNumber())) {
             throw new InvalidMobileNumberException();
         }
+
         if (changeMobileNumberDto.getOldMobileNumber().equals(changeMobileNumberDto.getNewMobileNumber())) {
             throw new NewNumberSameLikeOldNumberException();
         }
+
         Customer existingCustomer = customerRepository.findByMobileNumber(changeMobileNumberDto.getNewMobileNumber());
         if (existingCustomer != null) {
             throw new MobileNumberAlreadyTakenException(changeMobileNumberDto.getNewMobileNumber());
         }
+
         customer.setMobileNumber(changeMobileNumberDto.getNewMobileNumber());
         customerRepository.save(customer);
         return customer;
@@ -170,6 +178,7 @@ public class CustomerService {
         if (existingUser != null) {
             throw new EmailAlreadyTakenException(changeEmailDto.getNewEmail());
         }
+
         user.setEmail(changeEmailDto.getNewEmail());
         userRepository.save(user);
         return customerRepository.findByUser(user);
@@ -187,6 +196,7 @@ public class CustomerService {
         if (customer == null) {
             throw new CustomerNotFoundException();
         }
+
         return customer.getId();
     }
 }
