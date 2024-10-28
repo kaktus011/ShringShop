@@ -4,7 +4,6 @@ import com.example.SpringShop.Controllers.ProductController;
 import com.example.SpringShop.Dto.Error.ErrorResponseDto;
 import com.example.SpringShop.Dto.Product.ProductCreateDto;
 import com.example.SpringShop.Dto.Product.ProductDetailsDto;
-import com.example.SpringShop.Dto.Product.ProductIndexDto;
 import com.example.SpringShop.Entities.*;
 import com.example.SpringShop.EntityMappers.ProductMapper;
 import com.example.SpringShop.Exceptions.*;

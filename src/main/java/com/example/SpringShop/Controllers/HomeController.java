@@ -11,6 +11,7 @@ import com.example.SpringShop.Services.RecentSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +38,7 @@ public class HomeController {
     }
 
     //TODO
+    @PreAuthorize("hasAnyRole('CUSTOMER')")
     @GetMapping
     public ResponseEntity<?> loadHome() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,8 +55,7 @@ public class HomeController {
         } catch (CustomerNotFoundException | UserNotFoundException ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ErrorResponseDto errorResponse = new ErrorResponseDto(ex.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + errorResponse);
         }

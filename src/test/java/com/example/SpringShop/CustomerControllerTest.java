@@ -5,7 +5,6 @@ import com.example.SpringShop.Dto.Customer.*;
 import com.example.SpringShop.Entities.Customer;
 import com.example.SpringShop.Entities.User;
 import com.example.SpringShop.Exceptions.*;
-import com.example.SpringShop.Repositories.CustomerRepository;
 import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.UserService;
 import com.example.SpringShop.Utilities.JWTUtil;
@@ -23,12 +22,10 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class CustomerControllerTest {
-
 
     @Mock
     private CustomerService customerService;
@@ -54,102 +51,6 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void testRegisterSuccess() throws Exception {
-        RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
-        Customer newCustomer = new Customer();
-        newCustomer.setId(1L);
-
-        when(customerService.register(any(RegisterDto.class))).thenReturn(newCustomer);
-
-        ResponseEntity<?> response = customerController.register(registerDto);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(newCustomer, response.getBody());
-    }
-
-    @Test
-    void testRegisterUsernameAlreadyExists() throws Exception {
-        RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
-
-        when(customerService.register(any(RegisterDto.class))).thenThrow(new UsernameAlreadyExistsException("username"));
-
-        ResponseEntity<?> response = customerController.register(registerDto);
-
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Customer with username 'username' already exists.", response.getBody());
-    }
-
-    @Test
-    void testRegisterEmailAlreadyExists() throws Exception {
-        RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
-
-        when(customerService.register(any(RegisterDto.class))).thenThrow(new EmailAlreadyExistsException("email@example.com"));
-
-        ResponseEntity<?> response = customerController.register(registerDto);
-
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Customer with email 'email@example.com' already exists.", response.getBody());
-    }
-
-    @Test
-    void testRegisterMobileNumberAlreadyExists() throws Exception {
-        RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
-
-        when(customerService.register(any(RegisterDto.class))).thenThrow(new MobileNumberAlreadyExistsException("0123456789"));
-
-        ResponseEntity<?> response = customerController.register(registerDto);
-
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals("Customer with mobile number '0123456789' already exists.", response.getBody());
-    }
-
-    @Test
-    void testRegisterUnexpectedError() throws Exception {
-        RegisterDto registerDto = new RegisterDto("0123456789", "test" , "username", "password" , "password", "email@example.com");
-
-        when(customerService.register(any(RegisterDto.class))).thenThrow(new RuntimeException("Unexpected error."));
-
-        ResponseEntity<?> response = customerController.register(registerDto);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("An unexpected error occurred with registering.", response.getBody());
-    }
-
-    @Test
-    void testLogin_Success() {
-        LoginDto loginDto = new LoginDto("testUser", "testPassword");
-        String token = "validJwtToken";
-
-        when(customerService.login(loginDto)).thenReturn(token);
-
-        ResponseEntity<?> response = customerController.login(loginDto);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(token, response.getBody());
-    }
-
-    @Test
-    void testLogin_InvalidCredentials() {
-        LoginDto loginDto =  new LoginDto("testUser", "wrongPassword");
-
-        when(customerService.login(loginDto)).thenThrow(new InvalidCredentialsException());
-
-        ResponseEntity<?> response = customerController.login(loginDto);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Invalid username or password.", response.getBody());
-    }
-
-    @Test
-    void testLogin_UnexpectedError() {
-        LoginDto loginDto = new LoginDto("testUser", "testPassword");
-
-        when(customerService.login(loginDto)).thenThrow(new RuntimeException("An unexpected error occurred."));
-
-        ResponseEntity<?> response = customerController.login(loginDto);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("An unexpected error occurred with logging in.", response.getBody());
-    }
-
-    @Test
     void testLogout_Success() {
         String token = "validToken";
         String authorizationHeader = "Bearer " + token;
@@ -159,14 +60,12 @@ public class CustomerControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Logged out successfully.", response.getBody());
         verify(jwtUtil).invalidateToken(token);
-        assertEquals(SecurityContextHolder.getContext().getAuthentication(), null);
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
     @Test
     void testLogout_MissingAuthorizationHeader() {
-        String authorizationHeader = null;
-
-        ResponseEntity<?> response = customerController.logout(authorizationHeader);
+        ResponseEntity<?> response = customerController.logout(null);
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("You are not logged in.", response.getBody());
@@ -230,7 +129,7 @@ public class CustomerControllerTest {
         SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
 
         when(customerService.changeUsername(changeUsernameDto, "currentUsername"))
-                .thenThrow(new UserNotFoundException("currentUsername"));
+                .thenThrow(new UserNotFoundException());
 
         ResponseEntity<?> response = customerController.changeUsername(changeUsernameDto);
 

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -30,36 +31,10 @@ public class CustomerController {
         this.jwtUtil = jwtUtil;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto) {
-        try {
-            Customer newCustomer = customerService.register(registerDto);
-            return ResponseEntity.ok(newCustomer);
-        } catch (UsernameAlreadyExistsException | EmailAlreadyExistsException | MobileNumberAlreadyExistsException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ex.getMessage());
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest()
-                    .body("An unexpected error occurred with registering.");
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginDto loginDto) {
-        try {
-            String token = customerService.login(loginDto);
-            return ResponseEntity.ok(token);
-        } catch (InvalidCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with logging in.");
-        }
-    }
-
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") || authorizationHeader.length() <= 7) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") || authorizationHeader.length() == 7) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("You are not logged in.");
         }
@@ -71,6 +46,7 @@ public class CustomerController {
         return ResponseEntity.ok("Logged out successfully.");
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/change-username")
     public ResponseEntity<?> changeUsername(@Valid @RequestBody ChangeUsernameDto changeUsernameDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -88,10 +64,11 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing username.");
+                    .body("An unexpected error occurred with changing username. " + ex.getMessage());
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -105,10 +82,11 @@ public class CustomerController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing password.");
+                    .body("An unexpected error occurred with changing password. " + ex.getMessage());
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/details")
     public ResponseEntity<?> getCustomerDetails() {
          Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -122,10 +100,11 @@ public class CustomerController {
              return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
          }catch (Exception ex) {
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                     .body("An unexpected error occurred with getting details.");
+                     .body("An unexpected error occurred with getting details. " + ex.getMessage());
          }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/change-mobile-number")
     public ResponseEntity<?> changeMobileNumber(@Valid @RequestBody ChangeMobileNumberDto changeMobileNumberDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -141,10 +120,11 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());}
         catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing mobile number.");
+                    .body("An unexpected error occurred with changing mobile number. " + ex.getMessage());
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/change-email")
     public ResponseEntity<?> changeEmail(@Valid @RequestBody ChangeEmailDto changeEmailDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -160,7 +140,7 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
         }catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An unexpected error occurred with changing email.");
+                    .body("An unexpected error occurred with changing email. " + ex.getMessage());
         }
     }
 }

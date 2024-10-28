@@ -11,6 +11,7 @@ import com.example.SpringShop.Services.CustomerService;
 import com.example.SpringShop.Services.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ public class FavouritesController {
         this.productService = productService;
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/get-favourites")
     public ResponseEntity<?> getFavouriteProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -45,6 +47,7 @@ public class FavouritesController {
         }
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/favourite/{id}")
     public ResponseEntity<?> makeProductFavourite(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,7 +66,8 @@ public class FavouritesController {
         }
     }
 
-    @PostMapping("/unfavourite/{id}")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @PostMapping("/un-favourite/{id}")
     public ResponseEntity<?> deleteFavouriteProduct(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -82,6 +86,7 @@ public class FavouritesController {
 
     //TODO: Implement the getFavouriteSearches, makeSearchFavourite, deleteFavouriteSearch endpoints
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/get-recent-products")
     public ResponseEntity<?> getRecentProducts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
